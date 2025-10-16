@@ -13,7 +13,19 @@ SmartStow is a product of **The Good Business Software Company Inc.** that provi
 
 ## Viewing the Website
 
-Simply open `index.html` in your web browser, or serve it using any static web server:
+### GitHub Pages Deployment
+
+This site is configured for GitHub Pages and will be available at `smartstowapp.com` once DNS is configured.
+
+To enable GitHub Pages:
+1. Go to repository Settings → Pages
+2. Select the branch to deploy (e.g., `main` or `copilot/add-landing-page-website`)
+3. Keep the root folder as source
+4. The CNAME file configures the custom domain
+
+### Local Development
+
+To view locally, open `index.html` in your web browser, or serve it using any static web server:
 
 ```bash
 # Using Python
