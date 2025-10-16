@@ -41,8 +41,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Observe feature cards
     const cards = document.querySelectorAll('.feature-card');
+    
+    // Add animation preparation class and observe
     cards.forEach(card => {
-        observer.observe(card);
+        // Check if card is already in viewport
+        const rect = card.getBoundingClientRect();
+        const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+        
+        if (isInViewport) {
+            // If already in viewport, show immediately without animation
+            card.classList.add('fade-in');
+        } else {
+            // Otherwise, prepare for scroll animation
+            card.classList.add('animate-on-scroll');
+            observer.observe(card);
+        }
     });
 
     // Store button click handlers (for future integration)
@@ -56,16 +69,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Add fade-in animation styles dynamically
+// Add fade-in animation styles
 const style = document.createElement('style');
 style.textContent = `
-    .feature-card {
+    .feature-card.animate-on-scroll {
         opacity: 0;
         transform: translateY(20px);
         transition: opacity 0.6s ease, transform 0.6s ease;
     }
     
-    .feature-card.fade-in {
+    .feature-card.animate-on-scroll.fade-in {
         opacity: 1;
         transform: translateY(0);
     }
