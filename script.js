@@ -58,15 +58,82 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Store button click handlers (for future integration)
-    const storeButtons = document.querySelectorAll('.store-button');
-    storeButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+    // Beta Signup Form Handler
+    const betaForm = document.getElementById('betaSignupForm');
+
+    if (betaForm) {
+        const API_URL = 'https://smartstow-backend-589274766301.us-central1.run.app/api/beta-signup';
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const loader = document.getElementById('loader');
+        const messageDiv = document.getElementById('message');
+
+        betaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Placeholder for future app store links
-            alert('App coming soon! Check back later for download links.');
+
+            const email = document.getElementById('email').value;
+            const agreedToTerms = document.getElementById('agreedToTerms').checked;
+            const agreedToPrivacy = document.getElementById('agreedToPrivacy').checked;
+
+            // Validate checkboxes
+            if (!agreedToTerms || !agreedToPrivacy) {
+                showMessage('Please agree to the Terms and Conditions and Privacy Policy', 'error');
+                return;
+            }
+
+            // Show loading state
+            setLoading(true);
+            hideMessage();
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email,
+                        agreedToTerms,
+                        agreedToPrivacy
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(data.message || 'Thank you! We\'ll be in touch soon.', 'success');
+                    betaForm.reset();
+                } else {
+                    showMessage(data.error || 'Something went wrong. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                setLoading(false);
+            }
         });
-    });
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            if (isLoading) {
+                btnText.style.display = 'none';
+                loader.style.display = 'block';
+            } else {
+                btnText.style.display = 'inline';
+                loader.style.display = 'none';
+            }
+        }
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+        }
+
+        function hideMessage() {
+            messageDiv.className = 'message';
+        }
+    }
 });
 
 // Add fade-in animation styles
