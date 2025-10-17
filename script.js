@@ -1,5 +1,26 @@
 // Smooth scrolling for navigation links
 document.addEventListener('DOMContentLoaded', function() {
+    // Hamburger menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (hamburger && navLinks) {
+        // Toggle menu when hamburger is clicked
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('nav-active');
+        });
+
+        // Close menu when a nav link is clicked
+        const navItems = navLinks.querySelectorAll('a');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('nav-active');
+            });
+        });
+    }
+
     // Smooth scroll for all anchor links
     const links = document.querySelectorAll('a[href^="#"]');
     
