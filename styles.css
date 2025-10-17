@@ -55,6 +55,17 @@ body {
     align-items: center;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+}
+
 .logo h1 {
     color: var(--primary-color);
     font-size: 1.8rem;
@@ -195,8 +206,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.mic-icon {
-    font-size: 5rem;
+.hero-logo {
+    width: 120px;
+    height: 120px;
     margin-bottom: 1rem;
     animation: pulse 2s ease-in-out infinite;
 }
@@ -206,7 +218,7 @@ body {
         transform: scale(1);
     }
     50% {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 }
 
