@@ -521,7 +521,8 @@ input[type="checkbox"]:focus {
 }
 
 .submit-btn,
-.download-btn {
+.download-btn,
+button.download-btn {
     width: 100%;
     max-width: 300px;
     padding: 1.5rem 3rem;
@@ -533,15 +534,17 @@ input[type="checkbox"]:focus {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 2rem auto 0;
+    margin: 0;
     text-decoration: none;
+    font-family: inherit;
 }
 
 .submit-btn:hover:not(:disabled),
-.download-btn:hover {
+.download-btn:hover,
+button.download-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
     background: var(--white);
