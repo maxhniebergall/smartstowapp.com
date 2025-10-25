@@ -79,81 +79,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Beta Signup Form Handler
-    const betaForm = document.getElementById('betaSignupForm');
+    // Beta Download Button Handler
+    const termsCheckbox = document.getElementById('agreedToTerms');
+    const privacyCheckbox = document.getElementById('agreedToPrivacy');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-    if (betaForm) {
-        const API_URL = 'https://smartstow-backend-589274766301.us-central1.run.app/api/beta-signup';
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loader = document.getElementById('loader');
-        const messageDiv = document.getElementById('message');
+    if (termsCheckbox && privacyCheckbox && downloadBtn) {
+        // Function to check if download should be enabled
+        function updateDownloadButton() {
+            const bothChecked = termsCheckbox.checked && privacyCheckbox.checked;
 
-        betaForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const agreedToTerms = document.getElementById('agreedToTerms').checked;
-            const agreedToPrivacy = document.getElementById('agreedToPrivacy').checked;
-
-            // Validate checkboxes
-            if (!agreedToTerms || !agreedToPrivacy) {
-                showMessage('Please agree to the Terms and Conditions and Privacy Policy', 'error');
-                return;
+            if (bothChecked) {
+                downloadBtn.classList.remove('disabled');
+                downloadBtn.style.pointerEvents = 'auto';
+                downloadBtn.style.opacity = '1';
+            } else {
+                downloadBtn.classList.add('disabled');
+                downloadBtn.style.pointerEvents = 'none';
+                downloadBtn.style.opacity = '0.5';
             }
+        }
 
-            // Show loading state
-            setLoading(true);
-            hideMessage();
+        // Listen for checkbox changes
+        termsCheckbox.addEventListener('change', updateDownloadButton);
+        privacyCheckbox.addEventListener('change', updateDownloadButton);
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email,
-                        agreedToTerms,
-                        agreedToPrivacy
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showMessage(data.message || 'Thank you! We\'ll be in touch soon.', 'success');
-                    betaForm.reset();
-                } else {
-                    showMessage(data.error || 'Something went wrong. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Signup error:', error);
-                showMessage('Network error. Please check your connection and try again.', 'error');
-            } finally {
-                setLoading(false);
+        // Prevent download if checkboxes not checked
+        downloadBtn.addEventListener('click', function(e) {
+            if (!termsCheckbox.checked || !privacyCheckbox.checked) {
+                e.preventDefault();
+                alert('Please agree to the Terms and Conditions and Privacy Policy before downloading.');
             }
         });
 
-        function setLoading(isLoading) {
-            submitBtn.disabled = isLoading;
-            if (isLoading) {
-                btnText.style.display = 'none';
-                loader.style.display = 'block';
-            } else {
-                btnText.style.display = 'inline';
-                loader.style.display = 'none';
-            }
-        }
-
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type} show`;
-        }
-
-        function hideMessage() {
-            messageDiv.className = 'message';
-        }
+        // Initial state
+        updateDownloadButton();
     }
 });
 

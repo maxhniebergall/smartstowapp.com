@@ -406,7 +406,8 @@ body {
     z-index: 1;
 }
 
-.beta-form {
+.beta-form,
+.download-container {
     max-width: 500px;
     margin: 3rem auto 0;
     padding: 2.5rem;
@@ -516,7 +517,8 @@ input[type="checkbox"]:focus {
     opacity: 0.8;
 }
 
-.submit-btn {
+.submit-btn,
+.download-btn {
     width: 100%;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.95);
@@ -531,17 +533,28 @@ input[type="checkbox"]:focus {
     align-items: center;
     justify-content: center;
     margin-top: 2rem;
+    text-decoration: none;
 }
 
-.submit-btn:hover:not(:disabled) {
+.submit-btn:hover:not(:disabled),
+.download-btn:hover:not(.disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
     background: var(--white);
 }
 
-.submit-btn:disabled {
-    opacity: 0.6;
+.submit-btn:disabled,
+.download-btn.disabled {
+    opacity: 0.5;
     cursor: not-allowed;
+}
+
+.download-note {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.5;
 }
 
 .loader {
@@ -712,7 +725,8 @@ footer p {
         height: 480px;
     }
 
-    .beta-form {
+    .beta-form,
+    .download-container {
         padding: 2rem 1.5rem;
     }
 }
@@ -736,7 +750,8 @@ footer p {
         text-align: center;
     }
 
-    .beta-form {
+    .beta-form,
+    .download-container {
         padding: 1.5rem 1rem;
     }
 
