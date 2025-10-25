@@ -79,42 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Beta Download Button Handler
-    const termsCheckbox = document.getElementById('agreedToTerms');
-    const privacyCheckbox = document.getElementById('agreedToPrivacy');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    if (termsCheckbox && privacyCheckbox && downloadBtn) {
-        // Function to check if download should be enabled
-        function updateDownloadButton() {
-            const bothChecked = termsCheckbox.checked && privacyCheckbox.checked;
-
-            if (bothChecked) {
-                downloadBtn.classList.remove('disabled');
-                downloadBtn.style.pointerEvents = 'auto';
-                downloadBtn.style.opacity = '1';
-            } else {
-                downloadBtn.classList.add('disabled');
-                downloadBtn.style.pointerEvents = 'none';
-                downloadBtn.style.opacity = '0.5';
-            }
-        }
-
-        // Listen for checkbox changes
-        termsCheckbox.addEventListener('change', updateDownloadButton);
-        privacyCheckbox.addEventListener('change', updateDownloadButton);
-
-        // Prevent download if checkboxes not checked
-        downloadBtn.addEventListener('click', function(e) {
-            if (!termsCheckbox.checked || !privacyCheckbox.checked) {
-                e.preventDefault();
-                alert('Please agree to the Terms and Conditions and Privacy Policy before downloading.');
-            }
-        });
-
-        // Initial state
-        updateDownloadButton();
-    }
 });
 
 // Add fade-in animation styles

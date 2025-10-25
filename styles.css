@@ -520,31 +520,31 @@ input[type="checkbox"]:focus {
 .submit-btn,
 .download-btn {
     width: 100%;
-    padding: 1rem;
+    max-width: 300px;
+    padding: 1.5rem 3rem;
     background: rgba(255, 255, 255, 0.95);
     color: #000;
     border: none;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 15px;
+    font-size: 1.25rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 2rem;
+    margin: 2rem auto 0;
     text-decoration: none;
 }
 
 .submit-btn:hover:not(:disabled),
-.download-btn:hover:not(.disabled) {
+.download-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
     background: var(--white);
 }
 
-.submit-btn:disabled,
-.download-btn.disabled {
+.submit-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
