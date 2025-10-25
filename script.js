@@ -79,6 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Download button handler
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            window.location.href = 'https://github.com/maxhniebergall/smartstowapp.com/releases/download/AndroidBeta1.1/SmartStow1.1.apk';
+        });
+    }
 });
 
 // Add fade-in animation styles
