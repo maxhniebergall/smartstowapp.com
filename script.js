@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadBtn = document.getElementById('downloadBtn');
     if (downloadBtn) {
         downloadBtn.addEventListener('click', function() {
-            window.location.href = 'https://github.com/maxhniebergall/smartstowapp.com/releases/download/AndroidBeta1.1/SmartStow1.1.apk';
+            window.location.href = 'https://github.com/maxhniebergall/smartstowapp.com/releases/download/Android_Beta_1.2/SmartStow1.2.apk';
         });
     }
 });
