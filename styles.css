@@ -425,17 +425,20 @@ body {
 
 .pricing-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
     margin-top: 4rem;
     align-items: stretch;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .pricing-card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 2.5rem 2rem 2rem;
+    padding: 2rem 1.5rem 1.75rem;
     border-radius: 20px;
     border: 2px solid rgba(0, 0, 0, 0.08);
     box-shadow:
@@ -510,7 +513,7 @@ body {
 }
 
 .tier-name {
-    font-size: 1.85rem;
+    font-size: 1.65rem;
     margin-bottom: 0.5rem;
     margin-top: 0.5rem;
     color: var(--text-dark);
@@ -518,7 +521,7 @@ body {
 }
 
 .price {
-    font-size: 2.75rem;
+    font-size: 2.5rem;
     font-weight: 800;
     color: var(--text-dark);
     margin-bottom: 0.75rem;
@@ -535,32 +538,32 @@ body {
 }
 
 .tier-description {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--text-light);
-    margin-bottom: 1.75rem;
-    line-height: 1.6;
-    min-height: 3rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    min-height: 2.5rem;
 }
 
 .benefits-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 2.5rem 0;
+    margin: 0 0 2rem 0;
     text-align: left;
     flex-grow: 1;
     background: rgba(0, 0, 0, 0.02);
-    padding: 1.5rem;
+    padding: 1.25rem 1rem;
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .benefits-list li {
-    padding: 0.875rem 0;
+    padding: 0.75rem 0;
     color: var(--secondary-color);
-    line-height: 1.6;
+    line-height: 1.5;
     position: relative;
-    padding-left: 2rem;
-    font-size: 0.95rem;
+    padding-left: 1.85rem;
+    font-size: 0.875rem;
 }
 
 .benefits-list li:not(:last-child) {
@@ -571,12 +574,12 @@ body {
     content: '✓';
     position: absolute;
     left: 0;
-    top: 0.875rem;
+    top: 0.75rem;
     color: #000000;
     font-weight: 900;
-    font-size: 1.2rem;
-    width: 24px;
-    height: 24px;
+    font-size: 1.1rem;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -587,8 +590,8 @@ body {
 .pricing-card .btn {
     width: 100%;
     margin-top: auto;
-    padding: 1rem 2rem;
-    font-size: 1.05rem;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -1058,6 +1061,21 @@ footer p {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .pricing-featured {
+        transform: scale(1);
+    }
+
+    .pricing-featured:hover {
+        transform: translateY(-10px) scale(1);
+    }
+}
+
 @media (max-width: 768px) {
     /* Mobile Navigation */
     .hamburger {
@@ -1139,6 +1157,18 @@ footer p {
     .pricing-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    .pricing-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .pricing-featured {
+        transform: scale(1);
+    }
+
+    .pricing-featured:hover {
+        transform: translateY(-10px) scale(1);
     }
 
     .free-trial-highlight {
