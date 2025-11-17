@@ -1551,6 +1551,12 @@ footer p {
     display: block;
 }
 
+.blog-post-hero-image img[src$=".svg"] {
+    width: 200px;
+    max-width: 200px;
+    margin: 0 auto;
+}
+
 /* Blog Post Content */
 .blog-post-content {
     padding: 2rem 0 4rem;
