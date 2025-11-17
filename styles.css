@@ -1486,7 +1486,7 @@ footer p {
 
 .blog-post-header {
     padding: 3rem 0 2rem;
-    background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+    background: var(--white);
 }
 
 .blog-post-container {
@@ -1660,6 +1660,16 @@ footer p {
     margin: 0.5rem;
 }
 
+.blog-cta .btn-primary {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.blog-cta .btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
 .cta-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
@@ -1719,6 +1729,10 @@ footer p {
 
 .blog-cta-final .trust-signal {
     color: rgba(255, 255, 255, 0.8);
+}
+
+.blog-cta-final .cta-buttons {
+    justify-content: center;
 }
 
 /* Comparison Table */
