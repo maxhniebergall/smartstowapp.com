@@ -24,4 +24,36 @@
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
+
+  <!-- Blog Section -->
+  <url>
+    <loc>https://smartstowapp.com/blog/</loc>
+    <lastmod>2025-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!--
+  BLOG POST TEMPLATE - Copy this for each new blog post:
+
+  <url>
+    <loc>https://smartstowapp.com/blog/your-post-slug/</loc>
+    <lastmod>2025-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  Priority Guidelines:
+  - Homepage: 1.0
+  - Blog index: 0.8
+  - Comparison posts (money pages): 0.9
+  - Regular blog posts: 0.7
+  - Utility pages: 0.2-0.3
+
+  After adding a post:
+  1. Update lastmod to publication date
+  2. Commit and push changes
+  3. Submit to Google Search Console
+  -->
+
 </urlset>
