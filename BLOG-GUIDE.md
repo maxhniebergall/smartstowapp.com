@@ -482,11 +482,47 @@ Blog Index
 The lead magnet form template has this structure:
 
 ```html
-<form class="lead-magnet-form" action="[REPLACE-WITH-YOUR-BACKEND-API]" method="POST">
+  📝 Integration Example for Blog
+
+  Here's how to integrate this into your blog HTML:
+
+  <form id="lead-magnet-form" action="https://smartstow-backend-xxxxx.a.run.app/api/lead-magnet" method="POST">
     <input type="email" name="email" placeholder="Enter your email" required>
-    <input type="hidden" name="source" value="[REPLACE-post-slug]">
-    <button type="submit" class="btn btn-primary">Download Free PDF</button>
-</form>
+    <input type="hidden" name="source" value="moving-checklist-blog">
+    <button type="submit">Download Free PDF</button>
+    <div id="form-message"></div>
+  </form>
+
+  <script>
+  document.getElementById('lead-magnet-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const messageDiv = document.getElementById('form-message');
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.email.value,
+          source: form.source.value
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        messageDiv.innerHTML = '<p style="color: green;">✓ Success! Check your email for the download link.</p>';
+        form.reset();
+      } else {
+        messageDiv.innerHTML = '<p style="color: red;">✗ ' + data.message + '</p>';
+      }
+    } catch (error) {
+      messageDiv.innerHTML = '<p style="color: red;">✗ Something went wrong. Please try again.</p>';
+    }
+  });
+  </script>
+
 ```
 
 ### Setup Steps
