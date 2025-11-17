@@ -33,6 +33,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Blog Posts -->
+  <url>
+    <loc>https://smartstowapp.com/blog/car-break-in-packing-hack/</loc>
+    <lastmod>2025-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!--
   BLOG POST TEMPLATE - Copy this for each new blog post:
 
