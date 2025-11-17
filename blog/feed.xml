@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SmartStow Blog</title>
+    <description>Expert tips and guides on home organization, moving, storage solutions, and inventory management</description>
+    <link>https://smartstowapp.com/blog/</link>
+    <atom:link href="https://smartstowapp.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <language>en-us</language>
+    <lastBuildDate>[UPDATE THIS: Wed, 20 Nov 2025 08:00:00 GMT]</lastBuildDate>
+
+    <!--
+    HOW TO ADD A NEW POST TO THIS RSS FEED:
+
+    1. Copy the <item> template below
+    2. Fill in your post details
+    3. Add it at the top of the channel (newest posts first)
+    4. Update <lastBuildDate> above to current date
+    5. Keep only the most recent 10-20 posts in the feed
+
+    TEMPLATE FOR NEW POST:
+
+    <item>
+      <title>Your Post Title Here</title>
+      <description>A brief 1-2 sentence description of your post content</description>
+      <link>https://smartstowapp.com/blog/your-post-slug/</link>
+      <guid>https://smartstowapp.com/blog/your-post-slug/</guid>
+      <pubDate>Wed, 20 Nov 2025 08:00:00 GMT</pubDate>
+      <category>Category Name</category>
+    </item>
+    -->
+
+    <!-- Add your blog post items below this line -->
+    <!-- Keep newest posts at the top -->
+
+    <!-- Example item (remove this when you add real posts):
+    <item>
+      <title>Ultimate Moving Checklist: 50+ Items to Never Forget</title>
+      <description>Complete moving checklist with free printable PDF to organize every aspect of your move. Never lose track of your belongings again.</description>
+      <link>https://smartstowapp.com/blog/ultimate-moving-checklist/</link>
+      <guid>https://smartstowapp.com/blog/ultimate-moving-checklist/</guid>
+      <pubDate>Wed, 20 Nov 2025 08:00:00 GMT</pubDate>
+      <category>Moving Guides</category>
+    </item>
+    -->
+
+  </channel>
+</rss>
