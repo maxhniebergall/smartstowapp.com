@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="giftGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c41e3a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b0000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="100" cy="100" r="150" fill="#ffffff" opacity="0.03"/>
+  <circle cx="1100" cy="530" r="200" fill="#ffffff" opacity="0.03"/>
+
+  <!-- Storage box (decoy bin) -->
+  <g transform="translate(200, 200)">
+    <!-- Box body -->
+    <rect x="0" y="50" width="300" height="200" fill="url(#boxGradient)" rx="5"/>
+    <!-- Box lid -->
+    <rect x="-10" y="30" width="320" height="30" fill="#9a6324" rx="3"/>
+    <!-- Label on box -->
+    <rect x="70" y="120" width="160" height="60" fill="#f5f5dc" rx="2"/>
+    <text x="150" y="148" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">TAX RETURNS</text>
+    <text x="150" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">2018-2022</text>
+  </g>
+
+  <!-- Hidden gift peeking out -->
+  <g transform="translate(280, 180)">
+    <rect x="0" y="0" width="80" height="80" fill="url(#giftGradient)" rx="5"/>
+    <!-- Ribbon horizontal -->
+    <rect x="0" y="35" width="80" height="10" fill="#ffd700"/>
+    <!-- Ribbon vertical -->
+    <rect x="35" y="0" width="10" height="80" fill="#ffd700"/>
+    <!-- Bow -->
+    <ellipse cx="40" cy="5" rx="20" ry="12" fill="#ffd700"/>
+  </g>
+
+  <!-- Question marks floating -->
+  <text x="550" y="180" font-family="Arial, sans-serif" font-size="60" fill="#ffffff" opacity="0.3">?</text>
+  <text x="650" y="280" font-family="Arial, sans-serif" font-size="80" fill="#ffffff" opacity="0.2">?</text>
+  <text x="580" y="380" font-family="Arial, sans-serif" font-size="50" fill="#ffffff" opacity="0.25">?</text>
+
+  <!-- SmartStow phone mockup -->
+  <g transform="translate(750, 150)">
+    <!-- Phone body -->
+    <rect x="0" y="0" width="180" height="350" fill="#1a1a1a" rx="25"/>
+    <rect x="8" y="8" width="164" height="334" fill="#ffffff" rx="20"/>
+
+    <!-- Screen content -->
+    <rect x="20" y="50" width="140" height="40" fill="#f0f0f0" rx="5"/>
+    <text x="90" y="77" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#666">Search...</text>
+
+    <!-- Search result -->
+    <rect x="20" y="110" width="140" height="70" fill="#e8f5e9" rx="5"/>
+    <text x="30" y="135" font-family="Arial, sans-serif" font-size="12" fill="#2e7d32" font-weight="bold">Nintendo Switch</text>
+    <text x="30" y="155" font-family="Arial, sans-serif" font-size="11" fill="#666">Tax Returns bin</text>
+    <text x="30" y="170" font-family="Arial, sans-serif" font-size="10" fill="#999">Garage shelf</text>
+
+    <!-- Microphone icon -->
+    <circle cx="90" cy="310" r="25" fill="#000000"/>
+    <rect x="83" y="290" width="14" height="25" fill="#ffffff" rx="7"/>
+    <path d="M75 310 Q75 325 90 325 Q105 325 105 310" stroke="#ffffff" stroke-width="2" fill="none"/>
+    <line x1="90" y1="325" x2="90" y2="335" stroke="#ffffff" stroke-width="2"/>
+  </g>
+
+  <!-- Arrow from box to phone -->
+  <path d="M520 300 Q600 250 720 280" stroke="#4CAF50" stroke-width="4" fill="none" stroke-dasharray="10,5"/>
+  <polygon points="720,275 735,280 720,285" fill="#4CAF50"/>
+
+  <!-- Text overlay -->
+  <text x="600" y="550" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#ffffff" font-weight="bold">Never Lose a Hidden Gift Again</text>
+  <text x="600" y="590" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#cccccc">Log it with your voice. Find it instantly.</text>
+</svg>
