@@ -1,8 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Reddit Pixel -->
-    <script>
+    <!-- CookieConsent CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.css">
+
+    <!-- GA4 (Blocked until Consent) -->
+    <script type="text/plain" data-category="analytics">
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XS68YQNL5N');
+    </script>
+    <script type="text/plain" data-category="analytics" async src="https://www.googletagmanager.com/gtag/js?id=G-XS68YQNL5N"></script>
+
+    <!-- Reddit Pixel (Blocked until Consent) -->
+    <script type="text/plain" data-category="marketing">
     !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','a2_i4828a67cb2z');rdt('track', 'PageVisit');
     </script>
     <!-- DO NOT MODIFY UNLESS TO REPLACE A USER IDENTIFIER -->
@@ -389,5 +401,67 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <!-- CookieConsent Library -->
+    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.umd.js"></script>
+
+    <!-- CookieConsent Configuration -->
+    <script>
+    window.addEventListener('load', function(){
+        CookieConsent.run({
+            guiOptions: {
+                consentModal: {
+                    layout: 'box',
+                    position: 'bottom right',
+                    equalWeightButtons: true,
+                    flipButtons: false
+                },
+                preferencesModal: {
+                    layout: 'box',
+                    position: 'right',
+                    equalWeightButtons: true,
+                    flipButtons: false
+                }
+            },
+            categories: {
+                necessary: { readOnly: true },
+                analytics: { enabled: false },
+                marketing: { enabled: false }
+            },
+            language: {
+                default: 'en',
+                translations: {
+                    en: {
+                        consentModal: {
+                            title: 'We use cookies',
+                            description: 'We use cookies to analyze traffic and show relevant ads.',
+                            acceptAllBtn: 'Accept all',
+                            acceptNecessaryBtn: 'Reject all',
+                            showPreferencesBtn: 'Manage preferences'
+                        },
+                        preferencesModal: {
+                            title: 'Manage cookie preferences',
+                            acceptAllBtn: 'Accept all',
+                            acceptNecessaryBtn: 'Reject all',
+                            savePreferencesBtn: 'Save preferences',
+                            sections: [
+                                {
+                                    title: 'Analytics',
+                                    description: 'Tracks site usage to help us improve your experience.',
+                                    linkedCategory: 'analytics'
+                                },
+                                {
+                                    title: 'Marketing',
+                                    description: 'Used for advertising and retargeting.',
+                                    linkedCategory: 'marketing'
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        });
+    });
+    </script>
 </body>
 </html>
