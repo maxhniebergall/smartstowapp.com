@@ -10,12 +10,21 @@
 
     <!-- Blog Posts (newest first) -->
     <item>
-      <title>The "Junk Drawer" Paradox: Why Your Organizers Are Failing You (And How to Fix It)</title>
-      <description>Discover why traditional organizers fail and how SmartStow's voice recording system creates a flexible organization method that works with your life, not against it.</description>
-      <link>https://smartstowapp.com/blog/junk-drawer/</link>
-      <guid>https://smartstowapp.com/blog/junk-drawer/</guid>
-      <pubDate>Wed, 10 Dec 2025 08:00:00 GMT</pubDate>
-      <category>Organization Tips</category>
+       <title>SmartStow vs. Spreadsheets: We Timed It (The Ski Boot Bag Test)</title>
+       <description>We conducted a timed experiment comparing spreadsheet vs SmartStow for inventory tracking. The results surprised us.</description>
+       <link>https://smartstowapp.com/blog/smartstow-vs-spreadsheets/</link>
+       <guid>https://smartstowapp.com/blog/smartstow-vs-spreadsheets/</guid>
+       <pubDate>Wed, 10 Dec 2025 08:00:00 GMT</pubDate>
+       <category>Moving Tips</category>
+    </item>
+
+    <item>
+       <title>The "Junk Drawer" Paradox: Why Your Organizers Are Failing You (And How to Fix It)</title>
+       <description>Discover why traditional organizers fail and how SmartStow's voice recording system creates a flexible organization method that works with your life, not against it.</description>
+       <link>https://smartstowapp.com/blog/junk-drawer/</link>
+       <guid>https://smartstowapp.com/blog/junk-drawer/</guid>
+       <pubDate>Wed, 10 Dec 2025 08:00:00 GMT</pubDate>
+       <category>Organization Tips</category>
     </item>
 
     <item>

@@ -55,6 +55,13 @@
     <priority>0.7</priority>
   </url>
 
+  <url>
+    <loc>https://smartstowapp.com/blog/smartstow-vs-spreadsheets/</loc>
+    <lastmod>2025-12-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!--
   BLOG POST TEMPLATE - Copy this for each new blog post:
 
