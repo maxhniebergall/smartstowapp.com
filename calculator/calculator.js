@@ -38,13 +38,13 @@ const CONSTANTS = {
     CAPACITY_TRAILER: 390
 };
 
-// Base contents volume (loose items) excluding furniture [Source: PRD v2.0]
+// Base contents volume (loose items) excluding furniture and hobbies
 const BASE_VOLUMES = {
-    'studio': 100, 
-    '1bed': 200, 
-    '2bed': 350, 
-    '3bed': 500, 
-    '4bed': 700
+    'studio': 60, 
+    '1bed': 120, 
+    '2bed': 200, 
+    '3bed': 280, 
+    '4bed': 360
 };
 
 // Supply Calcs
