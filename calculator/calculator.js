@@ -21,11 +21,11 @@ const CONSTANTS = {
     ITEMS_PER_BOX_MIN: 15,   // Bulky items (Linens, Pots)
     ITEMS_PER_BOX_MAX: 22,   // Dense items (Books, Pantry)
     
-    PACKING_SPEED_MIN: 5,    // Fast DIY (Boxes per hour)
-    PACKING_SPEED_MAX: 1,    // Slow/Tired DIY (Boxes per hour)
+    PACKING_SPEED_MIN: 3,    // Fast DIY (Boxes per hour)
+    PACKING_SPEED_MAX: 2,    // Slow/Tired DIY (Boxes per hour)
     
     VACUUM_BAG_TIME_MIN: 15, 
-    VACUUM_BAG_TIME_MAX: 30, 
+    VACUUM_BAG_TIME_MAX: 25, 
     
     SMARTSTOW_SEC_PER_ITEM: 5.38, // Fixed digital benchmark
     
@@ -71,7 +71,7 @@ const HOBBY_DATA = [
     },
     { 
         id: 'ski', name: 'Ski/Snow', icon: '🎿', 
-        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 10, boxRatio: 0.0 }, high: { val: 25, boxRatio: 0.0 }, pro: { val: 40, boxRatio: 0.0 } } 
+        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 10, boxRatio: 0.0 }, high: { val: 25, boxRatio: 0.0 }, pro: { val: 50, boxRatio: 0.0 } } 
     },
     { 
         id: 'camping', name: 'Camping', icon: '⛺', 
@@ -79,7 +79,7 @@ const HOBBY_DATA = [
     },
     { 
         id: 'musician', name: 'Musician', icon: '🎸', 
-        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 15, boxRatio: 0.2 }, high: { val: 40, boxRatio: 0.3 }, pro: { val: 100, boxRatio: 0.4 } } 
+        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 10, boxRatio: 0.2 }, high: { val: 30, boxRatio: 0.3 }, pro: { val: 100, boxRatio: 0.4 } } 
     },
     { 
         id: 'gaming', name: 'Gaming', icon: '🎮', 
@@ -124,7 +124,20 @@ function initCalculator() {
         saveState();
     });
 
-    document.getElementById('calculateBtn').addEventListener('click', calculateMove);
+    const calculateBtn = document.getElementById('calculateBtn');
+    calculateBtn.addEventListener('click', calculateMove);
+
+    // Add mouseenter animation
+    calculateBtn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.15)';
+    });
+
+    // Add mouseleave animation
+    calculateBtn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
+    });
     document.getElementById('printPlan').addEventListener('click', () => window.print());
 
     attachAutoSaveListeners();
@@ -133,7 +146,7 @@ function initCalculator() {
 }
 
 function attachAutoSaveListeners() {
-    const ids = ['occupants', 'helpers'];
+    const ids = ['occupants'];
     ids.forEach(id => {
         document.getElementById(id).addEventListener('input', saveState);
     });
@@ -241,7 +254,6 @@ function saveState() {
     const state = {
         homeSize: document.getElementById('homeSize').value,
         occupants: document.getElementById('occupants').value,
-        helpers: document.getElementById('helpers').value,
         stuffLevel: document.querySelector('input[name="stuffLevel"]:checked').value,
         hobbies: {},
         furniture: {}
@@ -264,7 +276,6 @@ function loadState() {
         const state = JSON.parse(saved);
         document.getElementById('homeSize').value = state.homeSize || '3bed';
         document.getElementById('occupants').value = state.occupants || 2;
-        document.getElementById('helpers').value = state.helpers || 2;
         const radio = document.querySelector(`input[name="stuffLevel"][value="${state.stuffLevel}"]`);
         if (radio) radio.checked = true;
         if (state.furniture) {
@@ -322,7 +333,6 @@ function calculateMove() {
     // 1. Inputs
     const homeSizeKey = document.getElementById('homeSize').value;
     const occupants = parseInt(document.getElementById('occupants').value) || 1;
-    const helpers = parseInt(document.getElementById('helpers').value) || 0;
     const stuffLevel = document.querySelector('input[name="stuffLevel"]:checked').value;
     
     // 2. Volume Calculations (Base + Uncertainty)
@@ -359,9 +369,9 @@ function calculateMove() {
 
     // Specialty Supplies
     const numBedrooms = BEDROOM_COUNT[homeSizeKey];
-    const rawWardrobe = (occupants * 1.5);
+    const rawWardrobe = (occupants);
     const wardrobeBoxes = Math.ceil(rawWardrobe * multiplier);
-    const vacuumBags = Math.ceil((numBedrooms * 2) + occupants);
+    const vacuumBags = Math.ceil(numBedrooms + occupants*2);
     
     const volMin = (totalBoxableVol + totalFurnVol + (3*vacuumBags)) * 0.9 + (16*wardrobeBoxes);
     const volMax = (totalBoxableVol + totalFurnVol + (3*vacuumBags)) * 1.1 + (16*wardrobeBoxes);
@@ -402,14 +412,13 @@ function calculateMove() {
     const packTimeMin = (boxCountMin / CONSTANTS.PACKING_SPEED_MIN) + (wardrobeBoxes / CONSTANTS.PACKING_SPEED_MIN) + (vacuumBags * CONSTANTS.VACUUM_BAG_TIME_MIN / 60);
     const packTimeMax = (boxCountMax / CONSTANTS.PACKING_SPEED_MAX) + (wardrobeBoxes / CONSTANTS.PACKING_SPEED_MAX) + (vacuumBags * CONSTANTS.VACUUM_BAG_TIME_MAX / 60);
     
-    // Loading Time (Dependent on helpers)
-    const activeHelpers = Math.max(helpers, 1);
+    // Loading Time
     const estHobbyPieces = Math.ceil(hobbyFurnVol / 20); 
     const totalFurnPieces = houseFurnCount + estHobbyPieces;
     
     // Load Time Bounds (Variation in stamina/stairs not modeled, using standard algo)
-    const loadTimeMin = (boxCountMin / (12 * activeHelpers)) + ((totalFurnPieces * 0.20) / activeHelpers); // Efficient
-    const loadTimeMax = (boxCountMax / (8 * activeHelpers)) + ((totalFurnPieces * 0.30) / activeHelpers);  // Slow
+    const loadTimeMin = (boxCountMin / (12) + (totalFurnPieces * 0.20)); // Efficient
+    const loadTimeMax = (boxCountMax / (8) + (totalFurnPieces * 0.30));  // Slow
     
     const totalLaborMin = packTimeMin + loadTimeMin;
     const totalLaborMax = packTimeMax + loadTimeMax;
@@ -460,14 +469,28 @@ function calculateMove() {
     // Use Max Item Count for Plan Recommendation (Upsell safety)
     if (itemCountMax > 950) {
         pivotMsg.innerHTML = `You have between <strong>${itemCountMin.toLocaleString()} and ${itemCountMax.toLocaleString()} items</strong>.`;
-        recPlan.textContent = "Pro ($200)";
+        recPlan.textContent = "Pro";
     } else if (itemCountMax > 450) {
         pivotMsg.innerHTML = `You have between <strong>${itemCountMin.toLocaleString()} and ${itemCountMax.toLocaleString()} items</strong>.`;
-        recPlan.textContent = "Premium ($100)";
+        recPlan.textContent = "Premium";
     } else {
         pivotMsg.innerHTML = `You have between <strong>${itemCountMin.toLocaleString()} and ${itemCountMax.toLocaleString()} items</strong>.`;
-        recPlan.textContent = "Plus ($40)";
+        recPlan.textContent = "Plus";
     }
 
     document.getElementById('resultsArea').classList.remove('hidden');
+
+    // Add enhanced success animation to button
+    const btn = document.getElementById('calculateBtn');
+    btn.classList.add('btn-success-animation');
+
+    // Add temporary text change for better feedback
+    const originalText = btn.textContent;
+    btn.textContent = 'Calculating...';
+
+    // Reset after animation completes
+    setTimeout(() => {
+        btn.classList.remove('btn-success-animation');
+        btn.textContent = originalText;
+    }, 1200);
 }

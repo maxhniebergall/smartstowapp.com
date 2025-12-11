@@ -68,17 +68,12 @@
                                 <label for="occupants">Occupants (People)</label>
                                 <input type="number" id="occupants" name="occupants" min="1" value="2" required>
                             </div>
-                            <div class="input-wrapper">
-                                <label for="helpers">Helpers Available</label>
-                                <input type="number" id="helpers" name="helpers" min="0" value="2" required>
-                                <small>For loading/unloading labor calc</small>
-                            </div>
                         </div>
                     </div>
 
                     <div class="calc-group">
                         <h2>2. The "Stuff Level" Assessment</h2>
-                        <p class="subtitle">Be honest. This significantly impacts volume.</p>
+                        <p class="subtitle">Excluding hobbies. Think of clothes, kitchen, and misc items.</p>
                         <div class="radio-cards">
                             <label class="radio-card">
                                 <input type="radio" name="stuffLevel" value="minimalist">
@@ -98,14 +93,14 @@
                                 <input type="radio" name="stuffLevel" value="aboveAverage">
                                 <span class="card-content">
                                     <span class="card-title">Above Avg</span>
-                                    <span class="card-desc">Trouble throwing things away. Overflowing.</span>
+                                    <span class="card-desc">Full closests, and other storage spaces getting full.</span>
                                 </span>
                             </label>
                             <label class="radio-card">
                                 <input type="radio" name="stuffLevel" value="collector">
                                 <span class="card-content">
                                     <span class="card-title">Collector</span>
-                                    <span class="card-desc">Saved everything. Garage/Attic full.</span>
+                                    <span class="card-desc">Multiple large collections. Multiple full storage spaces.</span>
                                 </span>
                             </label>
                         </div>
@@ -126,7 +121,7 @@
                     </div>
 
                     <div class="calc-actions">
-                        <button type="button" id="calculateBtn" class="btn btn-primary btn-large">Calculate My Move</button>
+                        <button type="button" id="calculateBtn" class="btn btn-primary btn-large btn-click-ripple">Calculate My Move</button>
                     </div>
                 </form>
 
