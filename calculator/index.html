@@ -3,8 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Science of Moving Calculator | SmartStow</title>
-    <meta name="description" content="Calculate exactly how many boxes, what size truck, and how many hours you need for your move. Based on rigorous volumetric data.">
+    <title>Moving Calculator: Estimate Boxes, Truck Size & Packing Time | SmartStow</title>
+    <meta name="description" content="Calculate your exact moving checklist. Get accurate estimates for moving boxes, truck size (10' vs 26'), and packing labor hours based on your home size and hobbies.">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SmartStow Moving Calculator",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "A free tool to calculate moving boxes, truck size requirements, and packing labor hours based on home size and hobby inventory.",
+  "featureList": "Box estimator, Truck volume calculator, Packing time predictor",
+  "author": {
+    "@type": "Organization",
+    "name": "The Good Business Software Company Inc."
+  }
+}
+</script>
     
     <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="icon" type="image/svg+xml" href="../app_logo.svg">
@@ -42,7 +62,9 @@
     <main>
         <section class="calculator-hero">
             <div class="container">
-                <h1>The Science of Moving Calculator</h1>
+                <h1>Moving Calculator</h1>
+                <h2>Estimate Boxes, Truck Size & Packing Time</h2>
+                <br>
                 <p>Most people underestimate their move by 50%. Use our data-backed tool to calculate the exact volume, labor, and supplies you need. <em>(Calculations based on standard professional mover volumetric data (cubic ft per item) and average DIY packing speeds (3-5 boxes/hr)).</em></p>
             </div>
         </section>
@@ -52,7 +74,7 @@
                 <form id="moving-calculator" class="calculator-form">
                     
                     <div class="calc-group">
-                        <h2>1. Home Profile</h2>
+                        <h2>Step 1: What size home are you moving?</h2>
                         <div class="form-grid">
                             <div class="input-wrapper">
                                 <label for="homeSize">Home Size</label>
@@ -72,7 +94,7 @@
                     </div>
 
                     <div class="calc-group">
-                        <h2>2. The "Stuff Level" Assessment</h2>
+                        <h2>Step 2: Inventory Density ("Stuff Level")</h2>
                         <p class="subtitle">Be honest! "Average" includes the junk drawer and the boxes you haven't opened in years.</p>
                         <div class="radio-cards">
                             <label class="radio-card">
@@ -107,14 +129,14 @@
                     </div>
 
                     <div class="calc-group">
-                        <h2>3. The Hobby Matrix</h2>
+                        <h2>Step 3: Account for Hobbies & Specialized Gear</h2>
                         <p class="subtitle">Tap your hobbies to add them. We assume "Average" intensity unless you specify otherwise.</p>
                         <div class="hobby-card-grid" id="hobbyList">
                             </div>
                     </div>
 
                     <div class="calc-group">
-                        <h2>4. Major Furniture</h2>
+                        <h2>Step 4: Major Furniture & Large Items</h2>
                         <p class="subtitle">Adjust counts for large items.</p>
                         <div class="furniture-grid" id="furnitureList">
                             </div>
@@ -202,6 +224,37 @@
             </div>
         </section>
     </main>
+
+    <section class="calculator-methodology container" style="padding: 3rem 0; max-width: 800px; margin: 0 auto;">
+        <h3>How We Calculate Your Move</h3>
+        <p>Unlike generic calculators that only count rooms, the SmartStow algorithm accounts for the density of your lifestyle. We use three specific data points to generate your estimate:</p>
+
+        <ul style="list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1.5rem;">
+            <li><strong>Volumetric Weight by Hobby:</strong> We assign specific volume metrics to complex hobbies. For example, a "Cyclist" profile adds significantly more volume (bikes, stands, parts) than a standard "Avg" profile.</li>
+            <li><strong>Packing Velocity:</strong> We calculate labor hours based on a professional benchmark of 3-5 boxes packed per hour. If you are doing it yourself (DIY), expect to be on the lower end of this range.</li>
+            <li><strong>Truck Sizing Logic:</strong> Our truck recommendations are based on standard North American rental fleet sizes (10', 15', 20', 26'). <em>Note for international users: 1000 ft³ is approximately 28 m³.</em></li>
+        </ul>
+        <p><em>This tool provides an estimate. For a perfect inventory, download the SmartStow app to voice-log your items as you pack.</em></p>
+    </section>
+
+    <section class="calculator-faq container" style="padding-bottom: 4rem; max-width: 800px; margin: 0 auto;">
+        <h3>Frequently Asked Questions</h3>
+
+        <div class="faq-item" style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">How many boxes do I need for a 3-bedroom house?</h4>
+            <p>On average, a fully furnished 3-bedroom house requires between 70 and 100 medium-sized moving boxes. However, this varies wildly based on your lifestyle. A "Minimalist" household might only need 50, while a "Collector" could need 120+. Use the calculator above to adjust for your specific density.</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">What size moving truck should I rent?</h4>
+            <p>For a standard 2-bedroom apartment, a 20' truck (approx. 1,000 cu ft) is the safest choice to avoid multiple trips. For 3+ bedrooms, move up to a 26' truck. Our calculator helps you decide by computing the total cubic footage of your furniture and boxes combined.</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">How long does it take to pack a house?</h4>
+            <p>Packing is labor-intensive. Expect to spend roughly one hour for every 3-5 boxes. For a standard 3-bedroom home, this often totals 20-30 hours of pure packing labor. You can cut this time down by using voice-to-text inventory apps like SmartStow instead of writing manual lists.</p>
+        </div>
+    </section>
 
     <footer>
         <div class="container">
