@@ -1,9 +1,10 @@
 /**
- * SmartStow "Science of Moving" Calculator Logic v2.5
- * Updates:
- * - Added labor time for Wardrobe Boxes and Vacuum Bags to Packing Hours.
- * - Wardrobe Boxes: Calculated at standard box rate (approx 15 mins).
- * - Vacuum Bags: Calculated at ~10 mins per bag.
+ * SmartStow "Science of Moving" Calculator Logic v3.1 (Range-Based)
+ * * UPDATES:
+ * - Implements Upper/Lower bounds for all metrics as requested.
+ * - Packing Speed: Range of 3-5 boxes/hr (Source: Research Report).
+ * - Item Density: Range of 15-22 items/box (Source: Research Report).
+ * - Efficiency: Range of 65%-75% for truck sizing.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,11 +14,21 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Constants & Data Models ---
 
 const CONSTANTS = {
-    EFFICIENCY_FACTOR: 0.70, // Amateurs pack inefficiently
-    ITEMS_PER_BOX: 18,       // "Ground Truth" metric
-    PACKING_SPEED: 2,        // Boxes per hour (DIY average - 15 mins/box)
-    VACUUM_BAG_TIME_MIN: 20, // Minutes to stuff & vacuum a jumbo bag
-    SMARTSTOW_SEC_PER_ITEM: 5.38,
+    // Range Factors
+    EFFICIENCY_MIN: 0.75,    // Better packing (Professional-ish)
+    EFFICIENCY_MAX: 0.65,    // Worse packing (Hasty Amateur)
+    
+    ITEMS_PER_BOX_MIN: 15,   // Bulky items (Linens, Pots)
+    ITEMS_PER_BOX_MAX: 22,   // Dense items (Books, Pantry)
+    
+    PACKING_SPEED_MIN: 5,    // Fast DIY (Boxes per hour)
+    PACKING_SPEED_MAX: 1,    // Slow/Tired DIY (Boxes per hour)
+    
+    VACUUM_BAG_TIME_MIN: 15, 
+    VACUUM_BAG_TIME_MAX: 30, 
+    
+    SMARTSTOW_SEC_PER_ITEM: 5.38, // Fixed digital benchmark
+    
     // Truck Capacities (Approx Cubic Feet)
     CAPACITY_VAN: 240,
     CAPACITY_10FT: 400,
@@ -27,9 +38,13 @@ const CONSTANTS = {
     CAPACITY_TRAILER: 390
 };
 
-// Base contents volume (loose items) excluding furniture
+// Base contents volume (loose items) excluding furniture [Source: PRD v2.0]
 const BASE_VOLUMES = {
-    'studio': 30, '1bed': 60, '2bed': 100, '3bed': 150, '4bed': 250
+    'studio': 100, 
+    '1bed': 200, 
+    '2bed': 350, 
+    '3bed': 500, 
+    '4bed': 700
 };
 
 // Supply Calcs
@@ -38,7 +53,10 @@ const BEDROOM_COUNT = {
 };
 
 const STUFF_MULTIPLIERS = {
-    'minimalist': 0.70, 'average': 1.00, 'aboveAverage': 1.30, 'collector': 1.60
+    'minimalist': 0.70,
+    'average': 1.00,
+    'aboveAverage': 1.30,
+    'collector': 1.60
 };
 
 // Hobby Data
@@ -77,16 +95,19 @@ const HOBBY_DATA = [
     }
 ];
 
-const FURNITURE_DEFAULTS = {
-    'studio': { sofa: 1, table: 0, bed: 1, dresser: 1, desk: 1 },
-    '1bed': { sofa: 1, table: 1, bed: 1, dresser: 1, desk: 1 },
-    '2bed': { sofa: 1, table: 1, bed: 2, dresser: 2, desk: 1 },
-    '3bed': { sofa: 2, table: 1, bed: 3, dresser: 3, desk: 2 },
-    '4bed': { sofa: 2, table: 1, bed: 4, dresser: 4, desk: 3 }
+const FURNITURE_VOLS = {
+    'sofa': 50, 'sectional': 100, 'armchair': 20, 'coffeeTable': 5, 'tvConsole': 15,
+    'bookcase': 20, 'diningTable': 30, 'diningChair': 5, 'buffet': 40,
+    'kingBed': 75, 'queenBed': 60, 'twinBed': 40, 'dresser': 40, 'nightstand': 5,
+    'officeDesk': 30, 'appliance': 40, 'exerciseMachine': 35
 };
 
-const FURNITURE_VOLS = {
-    'sofa': 50, 'table': 30, 'bed': 60, 'dresser': 40, 'desk': 30
+const FURNITURE_DEFAULTS = {
+    'studio': { sofa: 1, coffeeTable: 1, queenBed: 1, dresser: 1, officeDesk: 1 },
+    '1bed':   { sofa: 1, coffeeTable: 1, tvConsole: 1, queenBed: 1, dresser: 1, nightstand: 1, officeDesk: 1, diningTable: 1, diningChair: 2 },
+    '2bed':   { sofa: 1, armchair: 1, coffeeTable: 1, tvConsole: 1, queenBed: 1, twinBed: 1, dresser: 2, nightstand: 2, officeDesk: 1, diningTable: 1, diningChair: 4 },
+    '3bed':   { sofa: 1, sectional: 0, armchair: 1, coffeeTable: 1, tvConsole: 1, bookcase: 1, queenBed: 1, twinBed: 2, dresser: 3, nightstand: 3, officeDesk: 1, diningTable: 1, diningChair: 4 },
+    '4bed':   { sofa: 1, sectional: 1, armchair: 1, coffeeTable: 1, tvConsole: 2, bookcase: 2, kingBed: 1, queenBed: 1, twinBed: 2, dresser: 4, nightstand: 4, officeDesk: 2, diningTable: 1, diningChair: 6 }
 };
 
 // --- Initialization ---
@@ -95,15 +116,9 @@ function initCalculator() {
     renderHobbies();
     renderFurniture();
     
-    // Attempt to load saved state
     const loaded = loadState();
-
-    // If no save found, set defaults
-    if (!loaded) {
-        updateFurnitureDefaults();
-    }
+    if (!loaded) updateFurnitureDefaults();
     
-    // Global Event Listeners
     document.getElementById('homeSize').addEventListener('change', () => {
         updateFurnitureDefaults();
         saveState();
@@ -114,9 +129,7 @@ function initCalculator() {
 
     attachAutoSaveListeners();
 
-    if (loaded) {
-        calculateMove();
-    }
+    if (loaded) calculateMove();
 }
 
 function attachAutoSaveListeners() {
@@ -128,23 +141,17 @@ function attachAutoSaveListeners() {
     const radios = document.querySelectorAll('input[name="stuffLevel"]');
     radios.forEach(r => r.addEventListener('change', saveState));
 
-    Object.keys(FURNITURE_VOLS).forEach(key => {
-        document.getElementById(`furn_${key}`).addEventListener('input', saveState);
-    });
 }
 
-// --- DOM Rendering & Logic ---
+// --- DOM Rendering ---
 
 function renderHobbies() {
     const container = document.getElementById('hobbyList');
-    
     container.innerHTML = HOBBY_DATA.map(hobby => `
         <div class="hobby-card" id="card_${hobby.id}" onclick="toggleHobby('${hobby.id}')">
             <div class="hobby-icon">${hobby.icon}</div>
             <div class="hobby-name">${hobby.name}</div>
-            
             <input type="hidden" id="level_${hobby.id}" value="">
-            
             <div class="intensity-selector" onclick="event.stopPropagation()">
                 <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', 'min', this)">Min</button>
                 <button type="button" class="level-btn selected" onclick="setHobbyLevel('${hobby.id}', 'avg', this)">Avg</button>
@@ -158,14 +165,12 @@ function renderHobbies() {
 window.toggleHobby = function(hobbyId) {
     const card = document.getElementById(`card_${hobbyId}`);
     const input = document.getElementById(`level_${hobbyId}`);
-    
     if (card.classList.contains('active')) {
         card.classList.remove('active');
         input.value = "";
     } else {
         card.classList.add('active');
         input.value = "avg";
-        
         const buttons = card.querySelectorAll('.level-btn');
         buttons.forEach(btn => btn.classList.remove('selected'));
         buttons[1].classList.add('selected'); 
@@ -176,36 +181,57 @@ window.toggleHobby = function(hobbyId) {
 window.setHobbyLevel = function(hobbyId, levelKey, btnElement) {
     const input = document.getElementById(`level_${hobbyId}`);
     const card = document.getElementById(`card_${hobbyId}`);
-    
-    if (!card.classList.contains('active')) {
-        card.classList.add('active');
-    }
+    if (!card.classList.contains('active')) card.classList.add('active');
     input.value = levelKey;
-    
     const buttons = card.querySelectorAll('.level-btn');
     buttons.forEach(b => b.classList.remove('selected'));
     btnElement.classList.add('selected');
-    
     saveState();
 };
 
 function renderFurniture() {
     const container = document.getElementById('furnitureList');
-    container.innerHTML = Object.keys(FURNITURE_VOLS).map(key => `
-        <div class="furn-item">
-            <label>${key.charAt(0).toUpperCase() + key.slice(1)}</label>
-            <input type="number" id="furn_${key}" min="0" value="0">
-        </div>
-    `).join('');
+    container.innerHTML = Object.keys(FURNITURE_VOLS).map(key => {
+        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        return `
+            <div class="furn-item">
+                <label>${label}</label>
+                <div class="quantity-selector">
+                    <button type="button" class="qty-btn minus" onclick="adjustFurniture('${key}', -1)">-</button>
+                    <span class="qty-display" id="qty_${key}">0</span>
+                    <button type="button" class="qty-btn plus" onclick="adjustFurniture('${key}', 1)">+</button>
+                </div>
+                <input type="hidden" id="furn_${key}" value="0">
+            </div>
+        `;
+    }).join('');
 }
+
+window.adjustFurniture = function(key, delta) {
+    const hidden = document.getElementById(`furn_${key}`);
+    const display = document.getElementById(`qty_${key}`);
+    let val = parseInt(hidden.value) || 0;
+    val += delta;
+    if (val < 0) val = 0;
+    hidden.value = val;
+    display.textContent = val;
+    saveState();
+};
 
 function updateFurnitureDefaults() {
     const homeSize = document.getElementById('homeSize').value;
     const defaults = FURNITURE_DEFAULTS[homeSize];
-    
+    Object.keys(FURNITURE_VOLS).forEach(key => {
+        const input = document.getElementById(`furn_${key}`);
+        const display = document.getElementById(`qty_${key}`);
+        if (input) input.value = 0;
+        if (display) display.textContent = 0;
+    });
     for (const [key, count] of Object.entries(defaults)) {
         const input = document.getElementById(`furn_${key}`);
+        const display = document.getElementById(`qty_${key}`);
         if (input) input.value = count;
+        if (display) display.textContent = count;
     }
 }
 
@@ -220,51 +246,42 @@ function saveState() {
         hobbies: {},
         furniture: {}
     };
-
     HOBBY_DATA.forEach(hobby => {
         const level = document.getElementById(`level_${hobby.id}`).value;
-        if (level) {
-            state.hobbies[hobby.id] = level;
-        }
+        if (level) state.hobbies[hobby.id] = level;
     });
-
     Object.keys(FURNITURE_VOLS).forEach(key => {
-        state.furniture[key] = document.getElementById(`furn_${key}`).value;
+        const el = document.getElementById(`furn_${key}`);
+        if (el) state.furniture[key] = el.value;
     });
-
-    localStorage.setItem('smartStowState_v1', JSON.stringify(state));
+    localStorage.setItem('smartStowState_v3', JSON.stringify(state));
 }
 
 function loadState() {
-    const saved = localStorage.getItem('smartStowState_v1');
+    const saved = localStorage.getItem('smartStowState_v3');
     if (!saved) return false;
-
     try {
         const state = JSON.parse(saved);
-
-        document.getElementById('homeSize').value = state.homeSize || '1bed';
-        document.getElementById('occupants').value = state.occupants || 1;
-        document.getElementById('helpers').value = state.helpers || 0;
-
+        document.getElementById('homeSize').value = state.homeSize || '3bed';
+        document.getElementById('occupants').value = state.occupants || 2;
+        document.getElementById('helpers').value = state.helpers || 2;
         const radio = document.querySelector(`input[name="stuffLevel"][value="${state.stuffLevel}"]`);
         if (radio) radio.checked = true;
-
         if (state.furniture) {
             for (const [key, val] of Object.entries(state.furniture)) {
                 const el = document.getElementById(`furn_${key}`);
+                const display = document.getElementById(`qty_${key}`);
                 if (el) el.value = val;
+                if (display) display.textContent = val;
             }
         }
-
         if (state.hobbies) {
             for (const [hobbyId, level] of Object.entries(state.hobbies)) {
                 const card = document.getElementById(`card_${hobbyId}`);
                 const input = document.getElementById(`level_${hobbyId}`);
-                
                 if (card && input) {
                     card.classList.add('active');
                     input.value = level;
-                    
                     const buttons = card.querySelectorAll('.level-btn');
                     const map = { 'min': 0, 'avg': 1, 'high': 2, 'pro': 3 };
                     if (map[level] !== undefined && buttons[map[level]]) {
@@ -281,7 +298,25 @@ function loadState() {
     }
 }
 
-// --- Calculation Logic ---
+// --- Helpers ---
+
+function formatRange(min, max, unit = "") {
+    if (Math.round(min) === Math.round(max)) return `${Math.round(max)}${unit}`;
+    return `${Math.round(min)} - ${Math.round(max)}${unit}`;
+}
+
+function getTruckRec(vol) {
+    if (vol <= CONSTANTS.CAPACITY_VAN) return "Cargo Van";
+    if (vol <= CONSTANTS.CAPACITY_10FT) return "10' Truck";
+    if (vol <= CONSTANTS.CAPACITY_15FT) return "15' Truck";
+    if (vol <= CONSTANTS.CAPACITY_20FT) return "20' Truck";
+    if (vol <= CONSTANTS.CAPACITY_26FT) return "26' Truck";
+    if (vol <= (CONSTANTS.CAPACITY_20FT + CONSTANTS.CAPACITY_TRAILER)) return "20' Truck + Trailer";
+    if (vol <= (CONSTANTS.CAPACITY_26FT + CONSTANTS.CAPACITY_TRAILER)) return "26' Truck + Trailer";
+    return "26' Truck + Trailer (Tight)";
+}
+
+// --- Main Calculation ---
 
 function calculateMove() {
     // 1. Inputs
@@ -290,7 +325,7 @@ function calculateMove() {
     const helpers = parseInt(document.getElementById('helpers').value) || 0;
     const stuffLevel = document.querySelector('input[name="stuffLevel"]:checked').value;
     
-    // 2. Volume Calculations
+    // 2. Volume Calculations (Base + Uncertainty)
     const baseVol = BASE_VOLUMES[homeSizeKey]; 
     const multiplier = STUFF_MULTIPLIERS[stuffLevel];
     const baseContentsVol = baseVol * multiplier;
@@ -318,78 +353,82 @@ function calculateMove() {
         houseFurnCount += count;
     }
     
-    // Totals
+    // Total Volume Bounds (Assuming +/- 10% variance on base volume estimations)
     const totalBoxableVol = baseContentsVol + hobbyBoxVol;
     const totalFurnVol = houseFurnVol + hobbyFurnVol;
-    const totalMoveVol = totalBoxableVol + totalFurnVol;
-    
-    // 3. Truck Sizing
-    const reqTruckSpace = totalMoveVol / CONSTANTS.EFFICIENCY_FACTOR;
-    
-    let truckRec = "";
-    let truckWarn = "";
 
-    if (reqTruckSpace <= CONSTANTS.CAPACITY_VAN) {
-        truckRec = "Cargo Van";
-    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_10FT) {
-        truckRec = "10' Truck";
-    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_15FT) {
-        truckRec = "15' Truck";
-    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_20FT) {
-        truckRec = "20' Truck";
-    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_26FT) {
-        truckRec = "26' Truck";
-    } else if (reqTruckSpace <= (CONSTANTS.CAPACITY_20FT + CONSTANTS.CAPACITY_TRAILER)) {
-        truckRec = "20' Truck + Trailer";
-        truckWarn = "Heavy load: A trailer is recommended.";
-    } else if (reqTruckSpace <= (CONSTANTS.CAPACITY_26FT + CONSTANTS.CAPACITY_TRAILER)) {
-        truckRec = "26' Truck + Trailer";
-        truckWarn = "Max Capacity: Requires precise packing.";
-    } else {
-        truckRec = "26' Truck + Trailer (Tight)";
-        truckWarn = "CRITICAL: You likely need 2 trips or a 53' semi.";
-    }
-
-    // 4. Box & Item Quantification
-    const boxCount = Math.ceil(totalBoxableVol / 3.0); 
-    const itemCount = boxCount * CONSTANTS.ITEMS_PER_BOX;
-    
-    // 5. Specialty Supplies
+    // Specialty Supplies
     const numBedrooms = BEDROOM_COUNT[homeSizeKey];
-    const rawWardrobe = (occupants * 1.5) + (numBedrooms * 1.0);
+    const rawWardrobe = (occupants * 1.5);
     const wardrobeBoxes = Math.ceil(rawWardrobe * multiplier);
     const vacuumBags = Math.ceil((numBedrooms * 2) + occupants);
+    
+    const volMin = (totalBoxableVol + totalFurnVol + (3*vacuumBags)) * 0.9 + (16*wardrobeBoxes);
+    const volMax = (totalBoxableVol + totalFurnVol + (3*vacuumBags)) * 1.1 + (16*wardrobeBoxes);
 
-    // 6. Labor Forecasting (UPDATED)
-    const stdBoxHours = boxCount / CONSTANTS.PACKING_SPEED;
+    // 3. Truck Sizing (Efficiency Ranges)
+    // Low efficiency (0.65) = High Required Space (Upper Bound)
+    // High efficiency (0.75) = Low Required Space (Lower Bound)
+    const reqTruckSpaceMin = volMin / CONSTANTS.EFFICIENCY_MIN;
+    const reqTruckSpaceMax = volMax / CONSTANTS.EFFICIENCY_MAX;
     
-    // Wardrobe Boxes: Assumed same speed as standard boxes for assembly/transfer 
-    const wardrobeHours = wardrobeBoxes / CONSTANTS.PACKING_SPEED;
+    const truckRecMin = getTruckRec(reqTruckSpaceMin);
+    const truckRecMax = getTruckRec(reqTruckSpaceMax);
     
-    // Vacuum Bags: Specific time per bag
-    const vacuumHours = vacuumBags * (CONSTANTS.VACUUM_BAG_TIME_MIN / 60);
+    let truckDisplayTop = truckRecMax;
+    let truckDisplayBot = null;
+    let truckDisplayOr = null;
+    if (truckRecMin !== truckRecMax) {
+        truckDisplayBot = truckRecMin;
+        truckDisplayTop = truckRecMax;
+        truckDisplayOr="OR";
+    } 
 
-    // Total Packing Time
-    const packingHours = stdBoxHours + wardrobeHours + vacuumHours;
+    const truckWarn = reqTruckSpaceMax > CONSTANTS.CAPACITY_26FT ? "Warning: Load may exceed single truck capacity." : "";
+
+    // 4. Box & Item Quantification
+    // Box Min = Lower Volume / 3.0
+    const boxCountMin = Math.ceil((totalBoxableVol * 0.9) / 3.0);
+    const boxCountMax = Math.ceil((totalBoxableVol * 1.1) / 3.0);
     
-    // Loading Time (Unchanged)
+    // Items: Min = Boxes * 15, Max = Boxes * 22
+    const itemCountMin = boxCountMin * CONSTANTS.ITEMS_PER_BOX_MIN;
+    const itemCountMax = boxCountMax * CONSTANTS.ITEMS_PER_BOX_MAX;
+    
+
+    // 6. Labor Forecasting (Ranges)
+    // Packing: Min Time (Fast Speed, Few Boxes) vs Max Time (Slow Speed, Many Boxes)
+    
+    const packTimeMin = (boxCountMin / CONSTANTS.PACKING_SPEED_MIN) + (wardrobeBoxes / CONSTANTS.PACKING_SPEED_MIN) + (vacuumBags * CONSTANTS.VACUUM_BAG_TIME_MIN / 60);
+    const packTimeMax = (boxCountMax / CONSTANTS.PACKING_SPEED_MAX) + (wardrobeBoxes / CONSTANTS.PACKING_SPEED_MAX) + (vacuumBags * CONSTANTS.VACUUM_BAG_TIME_MAX / 60);
+    
+    // Loading Time (Dependent on helpers)
     const activeHelpers = Math.max(helpers, 1);
     const estHobbyPieces = Math.ceil(hobbyFurnVol / 20); 
     const totalFurnPieces = houseFurnCount + estHobbyPieces;
-    const loadingHours = (boxCount / (10 * activeHelpers)) + ((totalFurnPieces * 0.25) / activeHelpers);
     
-    const totalLabor = packingHours + loadingHours;
-    const smartStowTime = (itemCount * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
+    // Load Time Bounds (Variation in stamina/stairs not modeled, using standard algo)
+    const loadTimeMin = (boxCountMin / (12 * activeHelpers)) + ((totalFurnPieces * 0.20) / activeHelpers); // Efficient
+    const loadTimeMax = (boxCountMax / (8 * activeHelpers)) + ((totalFurnPieces * 0.30) / activeHelpers);  // Slow
+    
+    const totalLaborMin = packTimeMin + loadTimeMin;
+    const totalLaborMax = packTimeMax + loadTimeMax;
+    
+    const smartStowTimeMin = (itemCountMin * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
+    const smartStowTimeMax = (itemCountMax * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
 
     // --- Render Results ---
     
-    const smallBoxes = Math.round(boxCount * 0.5);
-    const medBoxes = Math.round(boxCount * 0.3);
-    const lgBoxes = boxCount - smallBoxes - medBoxes;
+    // Box Splits (using Max for supply list safety)
+    const smallBoxes = Math.round(boxCountMax * 0.5);
+    const medBoxes = Math.round(boxCountMax * 0.3);
+    const lgBoxes = boxCountMax - smallBoxes - medBoxes;
 
-    document.getElementById('resTotalItems').textContent = itemCount.toLocaleString();
+    // Render Ranges
+    document.getElementById('resTotalItems').textContent = formatRange(itemCountMin, itemCountMax);
+    document.getElementById('resBoxCount').textContent = formatRange(boxCountMin, boxCountMax);
     
-    document.getElementById('resBoxCount').textContent = boxCount;
+    // Supply breakdown uses MAX to ensure user buys enough
     document.getElementById('resSmallBoxes').textContent = smallBoxes;
     document.getElementById('resMedBoxes').textContent = medBoxes;
     document.getElementById('resLgBoxes').textContent = lgBoxes;
@@ -400,25 +439,34 @@ function calculateMove() {
     const resVacuum = document.getElementById('resVacuumBags');
     if (resVacuum) resVacuum.textContent = vacuumBags;
     
-    document.getElementById('resTruckSize').textContent = truckRec;
-    document.getElementById('resTotalVol').textContent = Math.round(reqTruckSpace).toLocaleString();
-    document.getElementById('resTotalWeight').textContent = Math.round(reqTruckSpace * 7).toLocaleString();
+    document.getElementById('resTruckSizeBot').textContent = truckDisplayBot;
+    document.getElementById('resTruckSizeTop').textContent = truckDisplayTop;
+    document.getElementById('resTruckSizeOR').textContent = truckDisplayOr;
+    document.getElementById('resTotalVol').textContent = formatRange(reqTruckSpaceMin, reqTruckSpaceMax);
+    document.getElementById('resTotalWeight').textContent = formatRange(reqTruckSpaceMin * 6, reqTruckSpaceMax * 7); // 6-7 lbs density range
     document.getElementById('resTruckWarning').textContent = truckWarn;
     
-    document.getElementById('resTotalLabor').textContent = Math.round(totalLabor) + " hrs";
-    document.getElementById('resPackTime').textContent = packingHours.toFixed(1) + " hrs";
-    document.getElementById('resLoadTime').textContent = loadingHours.toFixed(1) + " hrs";
-    document.getElementById('resSmartStowTime').textContent = smartStowTime.toFixed(1);
+    document.getElementById('resTotalLabor').textContent = formatRange(totalLaborMin, totalLaborMax, " hrs");
+    document.getElementById('resPackTime').textContent = formatRange(packTimeMin, packTimeMax, " hrs");
+    document.getElementById('resLoadTime').textContent = formatRange(loadTimeMin, loadTimeMax, " hrs");
+    
+    // SmartStow savings
+    document.getElementById('resSmartStowTime').textContent = formatRange(smartStowTimeMin, smartStowTimeMax);
 
+    // Dynamic messaging
     const pivotMsg = document.getElementById('pivotMessage');
     const recPlan = document.getElementById('resRecPlan');
     
-    if (itemCount > 1000) {
-        pivotMsg.innerHTML = `You have <strong style="color:#e11d48">${itemCount.toLocaleString()} items</strong>. That is a £410 mistake waiting to happen if you rely on memory.`;
-        recPlan.textContent = "Premium or Pro";
+    // Use Max Item Count for Plan Recommendation (Upsell safety)
+    if (itemCountMax > 950) {
+        pivotMsg.innerHTML = `You have between <strong>${itemCountMin.toLocaleString()} and ${itemCountMax.toLocaleString()} items</strong>.`;
+        recPlan.textContent = "Pro ($200)";
+    } else if (itemCountMax > 450) {
+        pivotMsg.innerHTML = `You have between <strong>${itemCountMin.toLocaleString()} and ${itemCountMax.toLocaleString()} items</strong>.`;
+        recPlan.textContent = "Premium ($100)";
     } else {
-        pivotMsg.innerHTML = `You have <strong>${itemCount.toLocaleString()} items</strong>. Organization is key to a stress-free move.`;
-        recPlan.textContent = "Plus or Premium";
+        pivotMsg.innerHTML = `You have between <strong>${itemCountMin.toLocaleString()} and ${itemCountMax.toLocaleString()} items</strong>.`;
+        recPlan.textContent = "Plus ($40)";
     }
 
     document.getElementById('resultsArea').classList.remove('hidden');
