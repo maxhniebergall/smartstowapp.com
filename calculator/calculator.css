@@ -1,0 +1,414 @@
+/* Calculator Specific Styles */
+
+.calculator-hero {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%);
+    color: var(--white);
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.calculator-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.calculator-hero p {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.calculator-section {
+    padding: 3rem 0;
+    background: #f9fafb;
+}
+
+.calculator-form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.calc-group {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 2rem;
+}
+
+.calc-group:last-of-type {
+    border-bottom: none;
+}
+
+.calc-group h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-wrapper label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.input-wrapper select,
+.input-wrapper input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+/* Radio Cards for Stuff Level */
+.radio-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.radio-card {
+    position: relative;
+    cursor: pointer;
+}
+
+.radio-card input {
+    position: absolute;
+    opacity: 0;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    height: 100%;
+    transition: all 0.2s ease;
+}
+
+.radio-card input:checked + .card-content {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.02);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.card-title {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.card-desc {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* --- HOBBY MATRIX (Option 1: Active Cards) --- */
+.hobby-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.hobby-card {
+    background: #fff;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 1.25rem 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    position: relative;
+}
+
+.hobby-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: #ddd;
+}
+
+.hobby-card.active {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.hobby-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.hobby-card.active .hobby-icon {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.hobby-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+/* Intensity Selector (Inside the Card) */
+.intensity-selector {
+    display: flex;
+    gap: 4px;
+    margin-top: 0.5rem;
+    background: #f0f0f0;
+    padding: 4px;
+    border-radius: 20px;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: all 0.2s ease;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.hobby-card.active .intensity-selector {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.level-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-light);
+    padding: 4px 0;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.level-btn:hover {
+    color: var(--text-dark);
+    background: rgba(255,255,255,0.5);
+}
+
+.level-btn.selected {
+    background: var(--white);
+    color: var(--primary-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Furniture Grid */
+.furniture-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.furn-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.furn-item label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.furn-item input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.calc-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn-large {
+    font-size: 1.25rem;
+    padding: 1rem 3rem;
+}
+
+/* Results Area */
+.hidden {
+    display: none;
+}
+
+.results-area {
+    margin-top: 4rem;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.result-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+.result-card.highlight {
+    border: 2px solid var(--primary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.big-stat {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.stat-details p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--secondary-color);
+}
+
+.warning-text {
+    color: #e11d48;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.labor-breakdown {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.labor-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.smartstow-promo {
+    background: #e6fffa;
+    color: #047857;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.highlight-green {
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.pivot-cta {
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    color: var(--white);
+    padding: 3rem;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.pivot-cta h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.pivot-cta .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.small-trust {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .calculator-hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .big-stat {
+        font-size: 2.5rem;
+    }
+    
+    .pivot-cta {
+        padding: 2rem 1rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+    }
+    
+    .hobby-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

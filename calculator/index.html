@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Science of Moving Calculator | SmartStow</title>
+    <meta name="description" content="Calculate exactly how many boxes, what size truck, and how many hours you need for your move. Based on rigorous volumetric data.">
+    
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" type="image/svg+xml" href="../app_logo.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="calculator.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <a href="../" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+                        <img src="../app_logo.svg" alt="SmartStow Logo" class="logo-icon">
+                        <h1>SmartStow</h1>
+                    </a>
+                </div>
+                <button class="hamburger" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="nav-links">
+                    <a href="../#features">Features</a>
+                    <a href="../#pricing">Pricing</a>
+                    <a href="/blog/">Blog</a>
+                    <a href="/calculator/" class="nav-active">Calculator</a>
+                    <a href="../#download">Download</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="calculator-hero">
+            <div class="container">
+                <h1>The Science of Moving Calculator</h1>
+                <p>Most people underestimate their move by 50%. Use our data-backed tool to calculate the exact volume, labor, and supplies you need.</p>
+            </div>
+        </section>
+
+        <section class="calculator-section">
+            <div class="container">
+                <form id="moving-calculator" class="calculator-form">
+                    
+                    <div class="calc-group">
+                        <h2>1. Home Profile</h2>
+                        <div class="form-grid">
+                            <div class="input-wrapper">
+                                <label for="homeSize">Home Size</label>
+                                <select id="homeSize" name="homeSize" required>
+                                    <option value="studio">Studio</option>
+                                    <option value="1bed">1-Bedroom</option>
+                                    <option value="2bed">2-Bedroom</option>
+                                    <option value="3bed" selected>3-Bedroom</option>
+                                    <option value="4bed">4-Bedroom</option>
+                                </select>
+                            </div>
+                            <div class="input-wrapper">
+                                <label for="occupants">Occupants (People)</label>
+                                <input type="number" id="occupants" name="occupants" min="1" value="2" required>
+                            </div>
+                            <div class="input-wrapper">
+                                <label for="helpers">Helpers Available</label>
+                                <input type="number" id="helpers" name="helpers" min="0" value="2" required>
+                                <small>For loading/unloading labor calc</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calc-group">
+                        <h2>2. The "Stuff Level" Assessment</h2>
+                        <p class="subtitle">Be honest. This significantly impacts volume.</p>
+                        <div class="radio-cards">
+                            <label class="radio-card">
+                                <input type="radio" name="stuffLevel" value="minimalist">
+                                <span class="card-content">
+                                    <span class="card-title">Minimalist</span>
+                                    <span class="card-desc">Essentials only. Closets half-empty.</span>
+                                </span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="stuffLevel" value="average" checked>
+                                <span class="card-content">
+                                    <span class="card-title">Average</span>
+                                    <span class="card-desc">Standard accumulation. Full closets.</span>
+                                </span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="stuffLevel" value="aboveAverage">
+                                <span class="card-content">
+                                    <span class="card-title">Above Avg</span>
+                                    <span class="card-desc">Trouble throwing things away. Overflowing.</span>
+                                </span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="stuffLevel" value="collector">
+                                <span class="card-content">
+                                    <span class="card-title">Collector</span>
+                                    <span class="card-desc">Saved everything. Garage/Attic full.</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="calc-group">
+                        <h2>3. The Hobby Matrix</h2>
+                        <p class="subtitle">Tap your hobbies to add them. We assume "Average" intensity unless you specify otherwise.</p>
+                        <div class="hobby-card-grid" id="hobbyList">
+                            </div>
+                    </div>
+
+                    <div class="calc-group">
+                        <h2>4. Major Furniture</h2>
+                        <p class="subtitle">Adjust counts for large items.</p>
+                        <div class="furniture-grid" id="furnitureList">
+                            </div>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button type="button" id="calculateBtn" class="btn btn-primary btn-large">Calculate My Move</button>
+                    </div>
+                </form>
+
+                <div id="resultsArea" class="results-area hidden">
+                    <div class="results-header">
+                        <h2>Your Moving Forecast</h2>
+                        <p>Based on <span id="resTotalItems">0</span> estimated items.</p>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="card-icon">📦</div>
+                            <h3>The Supply List</h3>
+                            <div class="big-stat" id="resBoxCount">0</div>
+                            <p class="stat-label">Total Boxes Needed</p>
+                            <div class="stat-details">
+                                <p>~<span id="resSmallBoxes">0</span> Small Boxes</p>
+                                <p>~<span id="resMedBoxes">0</span> Medium Boxes</p>
+                                <p>~<span id="resLgBoxes">0</span> Large/XL Boxes</p>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="card-icon">🚚</div>
+                            <h3>The Vehicle Plan</h3>
+                            <div class="big-stat" id="resTruckSize">26'</div>
+                            <p class="stat-label">Recommended Truck</p>
+                            <div class="stat-details">
+                                <p>Total Volume: <span id="resTotalVol">0</span> ft³</p>
+                                <p>Est. Weight: <span id="resTotalWeight">0</span> lbs</p>
+                                <p class="warning-text" id="resTruckWarning"></p>
+                            </div>
+                        </div>
+
+                        <div class="result-card highlight">
+                            <div class="card-icon">⏱️</div>
+                            <h3>The Time Budget</h3>
+                            <div class="big-stat" id="resTotalLabor">0 hrs</div>
+                            <p class="stat-label">Total Labor Hours</p>
+                            <div class="labor-breakdown">
+                                <div class="labor-row">
+                                    <span>Packing time:</span>
+                                    <span id="resPackTime">0 hrs</span>
+                                </div>
+                                <div class="labor-row">
+                                    <span>Loading time:</span>
+                                    <span id="resLoadTime">0 hrs</span>
+                                </div>
+                            </div>
+                            <div class="smartstow-promo">
+                                <p><strong>SmartStow Advantage:</strong></p>
+                                <p>Organize everything in just <span class="highlight-green" id="resSmartStowTime">0</span> hours using voice-logging.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pivot-cta">
+                        <h3>Don't Let the Chaos Win.</h3>
+                        <p id="pivotMessage">You have over 1,000 items. Writing labels by hand is a mistake.</p>
+                        <div class="cta-buttons">
+                            <a href="../#download" class="btn btn-primary">Start Free Trial</a>
+                            <button id="printPlan" class="btn btn-secondary">Print My Plan</button>
+                        </div>
+                        <p class="small-trust">Recommended Plan: <strong id="resRecPlan">Premium</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 The Good Business Software Company Inc. All rights reserved.</p>
+            <p>SmartStow - Organize Your Life</p>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="calculator.js"></script>
+</body>
+</html>
