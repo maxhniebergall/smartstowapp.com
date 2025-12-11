@@ -1,7 +1,9 @@
 /**
- * SmartStow "Science of Moving" Calculator Logic v2.1
- * Updates: Separated Hobby volumes into "Boxable" (contents) and "Non-Boxable" (furniture)
- * based on item descriptions in PRD v2.0.
+ * SmartStow "Science of Moving" Calculator Logic v2.5
+ * Updates:
+ * - Added labor time for Wardrobe Boxes and Vacuum Bags to Packing Hours.
+ * - Wardrobe Boxes: Calculated at standard box rate (approx 15 mins).
+ * - Vacuum Bags: Calculated at ~10 mins per bag.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,131 +15,65 @@ document.addEventListener('DOMContentLoaded', () => {
 const CONSTANTS = {
     EFFICIENCY_FACTOR: 0.70, // Amateurs pack inefficiently
     ITEMS_PER_BOX: 18,       // "Ground Truth" metric
-    PACKING_SPEED: 4,        // Boxes per hour (DIY average)
+    PACKING_SPEED: 2,        // Boxes per hour (DIY average - 15 mins/box)
+    VACUUM_BAG_TIME_MIN: 20, // Minutes to stuff & vacuum a jumbo bag
     SMARTSTOW_SEC_PER_ITEM: 5.38,
-    SMALL_BOX_VOL: 1.5,
-    MED_BOX_VOL: 3.0,
-    LG_BOX_VOL: 4.5
+    // Truck Capacities (Approx Cubic Feet)
+    CAPACITY_VAN: 240,
+    CAPACITY_10FT: 400,
+    CAPACITY_15FT: 760,
+    CAPACITY_20FT: 1015,
+    CAPACITY_26FT: 1600,
+    CAPACITY_TRAILER: 390
 };
 
 // Base contents volume (loose items) excluding furniture
 const BASE_VOLUMES = {
-    'studio': 30,
-    '1bed': 60,
-    '2bed': 100,
-    '3bed': 150,
-    '4bed': 250
+    'studio': 30, '1bed': 60, '2bed': 100, '3bed': 150, '4bed': 250
+};
+
+// Supply Calcs
+const BEDROOM_COUNT = {
+    'studio': 1, '1bed': 1, '2bed': 2, '3bed': 3, '4bed': 4
 };
 
 const STUFF_MULTIPLIERS = {
-    'minimalist': 0.70,
-    'average': 1.00,
-    'aboveAverage': 1.30,
-    'collector': 1.60
+    'minimalist': 0.70, 'average': 1.00, 'aboveAverage': 1.30, 'collector': 1.60
 };
 
-/**
- * HOBBY DATA v2.1
- * 'val': Total Volume (ft3) from PRD
- * 'boxRatio': Percentage of volume that goes into boxes (0.0 to 1.0). 
- * The remainder is treated as "Furniture" (Truck space only).
- */
+// Hobby Data
 const HOBBY_DATA = [
     { 
-        id: 'cycling', 
-        name: 'Cycling', 
-        icon: '🚴', 
-        // Bikes are effectively furniture/loose items.
-        levels: { 
-            min: { val: 15, boxRatio: 0.0 }, // 1 Bike
-            avg: { val: 30, boxRatio: 0.0 }, // 2 Bikes
-            high: { val: 50, boxRatio: 0.1 }, // 3+ Bikes + Parts (10% parts)
-            pro: { val: 80, boxRatio: 0.2 }   // Team Setup (Tools/Parts)
-        } 
+        id: 'cycling', name: 'Cycling', icon: '🚴', 
+        levels: { min: { val: 15, boxRatio: 0.0 }, avg: { val: 30, boxRatio: 0.0 }, high: { val: 50, boxRatio: 0.1 }, pro: { val: 80, boxRatio: 0.2 } } 
     },
     { 
-        id: 'golf', 
-        name: 'Golf', 
-        icon: '⛳', 
-        // Golf bags are loose items.
-        levels: { 
-            min: { val: 5, boxRatio: 0.0 },  // 1 Bag
-            avg: { val: 10, boxRatio: 0.0 }, // Travel Case
-            high: { val: 20, boxRatio: 0.0 }, // 2 Bags/Nets
-            pro: { val: 40, boxRatio: 0.1 }   // Sim Setup (mostly screens/mats)
-        } 
+        id: 'golf', name: 'Golf', icon: '⛳', 
+        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 10, boxRatio: 0.0 }, high: { val: 20, boxRatio: 0.0 }, pro: { val: 40, boxRatio: 0.1 } } 
     },
     { 
-        id: 'ski', 
-        name: 'Ski/Snow', 
-        icon: '🎿', 
-        // Skis/Boards are loose/bundled.
-        levels: { 
-            min: { val: 5, boxRatio: 0.0 }, 
-            avg: { val: 10, boxRatio: 0.0 }, 
-            high: { val: 25, boxRatio: 0.0 }, 
-            pro: { val: 40, boxRatio: 0.0 } 
-        } 
+        id: 'ski', name: 'Ski/Snow', icon: '🎿', 
+        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 10, boxRatio: 0.0 }, high: { val: 25, boxRatio: 0.0 }, pro: { val: 40, boxRatio: 0.0 } } 
     },
     { 
-        id: 'camping', 
-        name: 'Camping', 
-        icon: '⛺', 
-        // Mix of gear (boxable) and bulky items (tents/coolers).
-        levels: { 
-            min: { val: 5, boxRatio: 1.0 },   // Basic (Sleeping bag - Boxable)
-            avg: { val: 25, boxRatio: 0.5 },  // Family Tent (Tent is loose, Kitchen is box)
-            high: { val: 50, boxRatio: 0.4 }, // Glamping (Furniture heavy)
-            pro: { val: 100, boxRatio: 0.4 }  // Expedition
-        } 
+        id: 'camping', name: 'Camping', icon: '⛺', 
+        levels: { min: { val: 5, boxRatio: 1.0 }, avg: { val: 25, boxRatio: 0.5 }, high: { val: 50, boxRatio: 0.4 }, pro: { val: 100, boxRatio: 0.4 } } 
     },
     { 
-        id: 'musician', 
-        name: 'Musician', 
-        icon: '🎸', 
-        // Instruments vs Amps vs Cables
-        levels: { 
-            min: { val: 5, boxRatio: 0.0 },   // 1 Instr (Case - Loose)
-            avg: { val: 15, boxRatio: 0.2 },  // Amps (Loose) + Pedals (Box)
-            high: { val: 40, boxRatio: 0.3 }, // Band Gear
-            pro: { val: 100, boxRatio: 0.4 }  // Studio (Rack gear/Monitors)
-        } 
+        id: 'musician', name: 'Musician', icon: '🎸', 
+        levels: { min: { val: 5, boxRatio: 0.0 }, avg: { val: 15, boxRatio: 0.2 }, high: { val: 40, boxRatio: 0.3 }, pro: { val: 100, boxRatio: 0.4 } } 
     },
     { 
-        id: 'gaming', 
-        name: 'Gaming', 
-        icon: '🎮', 
-        // Mostly boxable until Arcade level
-        levels: { 
-            min: { val: 3, boxRatio: 1.0 },   // Console (Box)
-            avg: { val: 10, boxRatio: 1.0 },  // PC Rig (Box)
-            high: { val: 25, boxRatio: 1.0 }, // Server/VR (Box)
-            pro: { val: 60, boxRatio: 0.5 }   // Arcade Cabinet (Furniture)
-        } 
+        id: 'gaming', name: 'Gaming', icon: '🎮', 
+        levels: { min: { val: 3, boxRatio: 1.0 }, avg: { val: 10, boxRatio: 1.0 }, high: { val: 25, boxRatio: 1.0 }, pro: { val: 60, boxRatio: 0.5 } } 
     },
     { 
-        id: 'garden', 
-        name: 'Garden', 
-        icon: '🌻', 
-        // Tools vs Machinery
-        levels: { 
-            min: { val: 2, boxRatio: 0.5 },   // Hand tools
-            avg: { val: 10, boxRatio: 0.1 },  // Mower (Furn)
-            high: { val: 30, boxRatio: 0.1 }, // Wheelbarrow (Furn)
-            pro: { val: 60, boxRatio: 0.05 }  // Tractor (Furn)
-        } 
+        id: 'garden', name: 'Garden', icon: '🌻', 
+        levels: { min: { val: 2, boxRatio: 0.5 }, avg: { val: 10, boxRatio: 0.1 }, high: { val: 30, boxRatio: 0.1 }, pro: { val: 60, boxRatio: 0.05 } } 
     },
     { 
-        id: 'crafter', 
-        name: 'Crafts', 
-        icon: '🎨', 
-        // Mostly small items
-        levels: { 
-            min: { val: 5, boxRatio: 1.0 },   // Sewing (Box)
-            avg: { val: 15, boxRatio: 1.0 },  // Paints (Box)
-            high: { val: 35, boxRatio: 0.9 }, // Stash (Box)
-            pro: { val: 70, boxRatio: 0.6 }   // Industrial Table (Furn)
-        } 
+        id: 'crafter', name: 'Crafts', icon: '🎨', 
+        levels: { min: { val: 5, boxRatio: 1.0 }, avg: { val: 15, boxRatio: 1.0 }, high: { val: 35, boxRatio: 0.9 }, pro: { val: 70, boxRatio: 0.6 } } 
     }
 ];
 
@@ -150,11 +86,7 @@ const FURNITURE_DEFAULTS = {
 };
 
 const FURNITURE_VOLS = {
-    'sofa': 50,
-    'table': 30, // Dining table
-    'bed': 60,   // Avg Queen
-    'dresser': 40,
-    'desk': 30
+    'sofa': 50, 'table': 30, 'bed': 60, 'dresser': 40, 'desk': 30
 };
 
 // --- Initialization ---
@@ -163,20 +95,46 @@ function initCalculator() {
     renderHobbies();
     renderFurniture();
     
-    // Event Listeners
-    document.getElementById('homeSize').addEventListener('change', updateFurnitureDefaults);
+    // Attempt to load saved state
+    const loaded = loadState();
+
+    // If no save found, set defaults
+    if (!loaded) {
+        updateFurnitureDefaults();
+    }
+    
+    // Global Event Listeners
+    document.getElementById('homeSize').addEventListener('change', () => {
+        updateFurnitureDefaults();
+        saveState();
+    });
+
     document.getElementById('calculateBtn').addEventListener('click', calculateMove);
     document.getElementById('printPlan').addEventListener('click', () => window.print());
-    
-    // Initial UI setup
-    updateFurnitureDefaults();
+
+    attachAutoSaveListeners();
+
+    if (loaded) {
+        calculateMove();
+    }
 }
 
-/**
- * Renders the "Active Card" Hobby Matrix
- * Note: Stores the Level String ('min', 'avg', etc.) instead of raw volume
- * to allow looking up the boxRatio later.
- */
+function attachAutoSaveListeners() {
+    const ids = ['occupants', 'helpers'];
+    ids.forEach(id => {
+        document.getElementById(id).addEventListener('input', saveState);
+    });
+
+    const radios = document.querySelectorAll('input[name="stuffLevel"]');
+    radios.forEach(r => r.addEventListener('change', saveState));
+
+    Object.keys(FURNITURE_VOLS).forEach(key => {
+        document.getElementById(`furn_${key}`).addEventListener('input', saveState);
+    });
+}
+
+// --- DOM Rendering & Logic ---
+
 function renderHobbies() {
     const container = document.getElementById('hobbyList');
     
@@ -202,19 +160,17 @@ window.toggleHobby = function(hobbyId) {
     const input = document.getElementById(`level_${hobbyId}`);
     
     if (card.classList.contains('active')) {
-        // Deactivate
         card.classList.remove('active');
         input.value = "";
     } else {
-        // Activate (Default to Average)
         card.classList.add('active');
         input.value = "avg";
         
-        // Visuals
         const buttons = card.querySelectorAll('.level-btn');
         buttons.forEach(btn => btn.classList.remove('selected'));
-        buttons[1].classList.add('selected'); // Index 1 is Avg
+        buttons[1].classList.add('selected'); 
     }
+    saveState();
 };
 
 window.setHobbyLevel = function(hobbyId, levelKey, btnElement) {
@@ -224,14 +180,13 @@ window.setHobbyLevel = function(hobbyId, levelKey, btnElement) {
     if (!card.classList.contains('active')) {
         card.classList.add('active');
     }
-    
-    // Set Level Key
     input.value = levelKey;
     
-    // Visuals
     const buttons = card.querySelectorAll('.level-btn');
     buttons.forEach(b => b.classList.remove('selected'));
     btnElement.classList.add('selected');
+    
+    saveState();
 };
 
 function renderFurniture() {
@@ -254,24 +209,93 @@ function updateFurnitureDefaults() {
     }
 }
 
+// --- State Management ---
+
+function saveState() {
+    const state = {
+        homeSize: document.getElementById('homeSize').value,
+        occupants: document.getElementById('occupants').value,
+        helpers: document.getElementById('helpers').value,
+        stuffLevel: document.querySelector('input[name="stuffLevel"]:checked').value,
+        hobbies: {},
+        furniture: {}
+    };
+
+    HOBBY_DATA.forEach(hobby => {
+        const level = document.getElementById(`level_${hobby.id}`).value;
+        if (level) {
+            state.hobbies[hobby.id] = level;
+        }
+    });
+
+    Object.keys(FURNITURE_VOLS).forEach(key => {
+        state.furniture[key] = document.getElementById(`furn_${key}`).value;
+    });
+
+    localStorage.setItem('smartStowState_v1', JSON.stringify(state));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('smartStowState_v1');
+    if (!saved) return false;
+
+    try {
+        const state = JSON.parse(saved);
+
+        document.getElementById('homeSize').value = state.homeSize || '1bed';
+        document.getElementById('occupants').value = state.occupants || 1;
+        document.getElementById('helpers').value = state.helpers || 0;
+
+        const radio = document.querySelector(`input[name="stuffLevel"][value="${state.stuffLevel}"]`);
+        if (radio) radio.checked = true;
+
+        if (state.furniture) {
+            for (const [key, val] of Object.entries(state.furniture)) {
+                const el = document.getElementById(`furn_${key}`);
+                if (el) el.value = val;
+            }
+        }
+
+        if (state.hobbies) {
+            for (const [hobbyId, level] of Object.entries(state.hobbies)) {
+                const card = document.getElementById(`card_${hobbyId}`);
+                const input = document.getElementById(`level_${hobbyId}`);
+                
+                if (card && input) {
+                    card.classList.add('active');
+                    input.value = level;
+                    
+                    const buttons = card.querySelectorAll('.level-btn');
+                    const map = { 'min': 0, 'avg': 1, 'high': 2, 'pro': 3 };
+                    if (map[level] !== undefined && buttons[map[level]]) {
+                        buttons.forEach(b => b.classList.remove('selected'));
+                        buttons[map[level]].classList.add('selected');
+                    }
+                }
+            }
+        }
+        return true;
+    } catch (e) {
+        console.error("Failed to load state", e);
+        return false;
+    }
+}
+
 // --- Calculation Logic ---
 
 function calculateMove() {
     // 1. Inputs
-    const homeSize = document.getElementById('homeSize').value;
+    const homeSizeKey = document.getElementById('homeSize').value;
     const occupants = parseInt(document.getElementById('occupants').value) || 1;
     const helpers = parseInt(document.getElementById('helpers').value) || 0;
-    
     const stuffLevel = document.querySelector('input[name="stuffLevel"]:checked').value;
     
     // 2. Volume Calculations
-    
-    // A. Base Contents (100% Boxable)
-    const baseVol = BASE_VOLUMES[homeSize];
+    const baseVol = BASE_VOLUMES[homeSizeKey]; 
     const multiplier = STUFF_MULTIPLIERS[stuffLevel];
     const baseContentsVol = baseVol * multiplier;
     
-    // B. Hobby Volume (Split: Boxable vs Furniture)
+    // Hobby Vol
     let hobbyBoxVol = 0;
     let hobbyFurnVol = 0;
     
@@ -280,15 +304,12 @@ function calculateMove() {
         if (levelKey) {
             const data = hobby.levels[levelKey];
             const totalHobbyVol = data.val;
-            const boxVol = totalHobbyVol * data.boxRatio;
-            const furnVol = totalHobbyVol * (1 - data.boxRatio);
-            
-            hobbyBoxVol += boxVol;
-            hobbyFurnVol += furnVol;
+            hobbyBoxVol += totalHobbyVol * data.boxRatio;
+            hobbyFurnVol += totalHobbyVol * (1 - data.boxRatio);
         }
     });
     
-    // C. Furniture Volume
+    // Furniture Vol
     let houseFurnVol = 0;
     let houseFurnCount = 0;
     for (const [key, vol] of Object.entries(FURNITURE_VOLS)) {
@@ -297,36 +318,64 @@ function calculateMove() {
         houseFurnCount += count;
     }
     
-    // D. Totals
-    // Total Boxable Volume (Base + Hobby Parts)
+    // Totals
     const totalBoxableVol = baseContentsVol + hobbyBoxVol;
-    
-    // Total Furniture Volume (House Furniture + Hobby Furniture)
     const totalFurnVol = houseFurnVol + hobbyFurnVol;
-    
-    // Total Move Volume
     const totalMoveVol = totalBoxableVol + totalFurnVol;
     
-    // 3. Truck Sizing (Efficiency Adjusted)
+    // 3. Truck Sizing
     const reqTruckSpace = totalMoveVol / CONSTANTS.EFFICIENCY_FACTOR;
     
+    let truckRec = "";
+    let truckWarn = "";
+
+    if (reqTruckSpace <= CONSTANTS.CAPACITY_VAN) {
+        truckRec = "Cargo Van";
+    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_10FT) {
+        truckRec = "10' Truck";
+    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_15FT) {
+        truckRec = "15' Truck";
+    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_20FT) {
+        truckRec = "20' Truck";
+    } else if (reqTruckSpace <= CONSTANTS.CAPACITY_26FT) {
+        truckRec = "26' Truck";
+    } else if (reqTruckSpace <= (CONSTANTS.CAPACITY_20FT + CONSTANTS.CAPACITY_TRAILER)) {
+        truckRec = "20' Truck + Trailer";
+        truckWarn = "Heavy load: A trailer is recommended.";
+    } else if (reqTruckSpace <= (CONSTANTS.CAPACITY_26FT + CONSTANTS.CAPACITY_TRAILER)) {
+        truckRec = "26' Truck + Trailer";
+        truckWarn = "Max Capacity: Requires precise packing.";
+    } else {
+        truckRec = "26' Truck + Trailer (Tight)";
+        truckWarn = "CRITICAL: You likely need 2 trips or a 53' semi.";
+    }
+
     // 4. Box & Item Quantification
-    // Only use Boxable Volume for box count
     const boxCount = Math.ceil(totalBoxableVol / 3.0); 
     const itemCount = boxCount * CONSTANTS.ITEMS_PER_BOX;
     
-    // 5. Labor Forecasting
-    const packingHours = boxCount / CONSTANTS.PACKING_SPEED;
+    // 5. Specialty Supplies
+    const numBedrooms = BEDROOM_COUNT[homeSizeKey];
+    const rawWardrobe = (occupants * 1.5) + (numBedrooms * 1.0);
+    const wardrobeBoxes = Math.ceil(rawWardrobe * multiplier);
+    const vacuumBags = Math.ceil((numBedrooms * 2) + occupants);
+
+    // 6. Labor Forecasting (UPDATED)
+    const stdBoxHours = boxCount / CONSTANTS.PACKING_SPEED;
     
-    // Loading: (Boxes / (10 * Helpers)) + (Furniture / Helpers)
+    // Wardrobe Boxes: Assumed same speed as standard boxes for assembly/transfer 
+    const wardrobeHours = wardrobeBoxes / CONSTANTS.PACKING_SPEED;
+    
+    // Vacuum Bags: Specific time per bag
+    const vacuumHours = vacuumBags * (CONSTANTS.VACUUM_BAG_TIME_MIN / 60);
+
+    // Total Packing Time
+    const packingHours = stdBoxHours + wardrobeHours + vacuumHours;
+    
+    // Loading Time (Unchanged)
     const activeHelpers = Math.max(helpers, 1);
-    
-    // We treat Hobby Furniture (e.g., Bikes) as "Furniture pieces" for loading time.
-    // Approx: 15 mins (0.25 hrs) per 20 cu ft of furniture? 
-    // Or simplified: Estimate piece count from volume (avg 20cf per piece)
     const estHobbyPieces = Math.ceil(hobbyFurnVol / 20); 
     const totalFurnPieces = houseFurnCount + estHobbyPieces;
-    
     const loadingHours = (boxCount / (10 * activeHelpers)) + ((totalFurnPieces * 0.25) / activeHelpers);
     
     const totalLabor = packingHours + loadingHours;
@@ -338,23 +387,18 @@ function calculateMove() {
     const medBoxes = Math.round(boxCount * 0.3);
     const lgBoxes = boxCount - smallBoxes - medBoxes;
 
-    let truckRec = "";
-    let truckWarn = "";
-    if (reqTruckSpace < 400) truckRec = "Cargo Van";
-    else if (reqTruckSpace < 800) truckRec = "10' - 15' Truck";
-    else if (reqTruckSpace < 1600) truckRec = "26' Truck";
-    else {
-        truckRec = "26' Truck + Trailer";
-        truckWarn = "Warning: High volume. You may need two trips.";
-    }
-
-    // Update DOM
     document.getElementById('resTotalItems').textContent = itemCount.toLocaleString();
     
     document.getElementById('resBoxCount').textContent = boxCount;
     document.getElementById('resSmallBoxes').textContent = smallBoxes;
     document.getElementById('resMedBoxes').textContent = medBoxes;
     document.getElementById('resLgBoxes').textContent = lgBoxes;
+
+    const resWardrobe = document.getElementById('resWardrobeBoxes');
+    if (resWardrobe) resWardrobe.textContent = wardrobeBoxes;
+
+    const resVacuum = document.getElementById('resVacuumBags');
+    if (resVacuum) resVacuum.textContent = vacuumBags;
     
     document.getElementById('resTruckSize').textContent = truckRec;
     document.getElementById('resTotalVol').textContent = Math.round(reqTruckSpace).toLocaleString();
@@ -378,5 +422,4 @@ function calculateMove() {
     }
 
     document.getElementById('resultsArea').classList.remove('hidden');
-    document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
 }
