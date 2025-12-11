@@ -1,6 +1,7 @@
 /**
- * SmartStow "Science of Moving" Calculator Logic v2.0
- * Based on Product Requirement Document v2.0
+ * SmartStow "Science of Moving" Calculator Logic v2.1
+ * Updates: Separated Hobby volumes into "Boxable" (contents) and "Non-Boxable" (furniture)
+ * based on item descriptions in PRD v2.0.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,11 +22,11 @@ const CONSTANTS = {
 
 // Base contents volume (loose items) excluding furniture
 const BASE_VOLUMES = {
-    'studio': 100,
-    '1bed': 200,
-    '2bed': 350,
-    '3bed': 500,
-    '4bed': 700
+    'studio': 30,
+    '1bed': 60,
+    '2bed': 100,
+    '3bed': 150,
+    '4bed': 250
 };
 
 const STUFF_MULTIPLIERS = {
@@ -35,55 +36,108 @@ const STUFF_MULTIPLIERS = {
     'collector': 1.60
 };
 
-// Updated Hobby Data with Icons and Short Labels for Segmented Control
+/**
+ * HOBBY DATA v2.1
+ * 'val': Total Volume (ft3) from PRD
+ * 'boxRatio': Percentage of volume that goes into boxes (0.0 to 1.0). 
+ * The remainder is treated as "Furniture" (Truck space only).
+ */
 const HOBBY_DATA = [
     { 
         id: 'cycling', 
         name: 'Cycling', 
         icon: '🚴', 
-        levels: { min: 15, avg: 30, high: 50, pro: 80 } 
+        // Bikes are effectively furniture/loose items.
+        levels: { 
+            min: { val: 15, boxRatio: 0.0 }, // 1 Bike
+            avg: { val: 30, boxRatio: 0.0 }, // 2 Bikes
+            high: { val: 50, boxRatio: 0.1 }, // 3+ Bikes + Parts (10% parts)
+            pro: { val: 80, boxRatio: 0.2 }   // Team Setup (Tools/Parts)
+        } 
     },
     { 
         id: 'golf', 
         name: 'Golf', 
         icon: '⛳', 
-        levels: { min: 5, avg: 10, high: 20, pro: 40 } 
+        // Golf bags are loose items.
+        levels: { 
+            min: { val: 5, boxRatio: 0.0 },  // 1 Bag
+            avg: { val: 10, boxRatio: 0.0 }, // Travel Case
+            high: { val: 20, boxRatio: 0.0 }, // 2 Bags/Nets
+            pro: { val: 40, boxRatio: 0.1 }   // Sim Setup (mostly screens/mats)
+        } 
     },
     { 
         id: 'ski', 
         name: 'Ski/Snow', 
         icon: '🎿', 
-        levels: { min: 5, avg: 10, high: 25, pro: 40 } 
+        // Skis/Boards are loose/bundled.
+        levels: { 
+            min: { val: 5, boxRatio: 0.0 }, 
+            avg: { val: 10, boxRatio: 0.0 }, 
+            high: { val: 25, boxRatio: 0.0 }, 
+            pro: { val: 40, boxRatio: 0.0 } 
+        } 
     },
     { 
         id: 'camping', 
         name: 'Camping', 
         icon: '⛺', 
-        levels: { min: 5, avg: 25, high: 50, pro: 100 } 
+        // Mix of gear (boxable) and bulky items (tents/coolers).
+        levels: { 
+            min: { val: 5, boxRatio: 1.0 },   // Basic (Sleeping bag - Boxable)
+            avg: { val: 25, boxRatio: 0.5 },  // Family Tent (Tent is loose, Kitchen is box)
+            high: { val: 50, boxRatio: 0.4 }, // Glamping (Furniture heavy)
+            pro: { val: 100, boxRatio: 0.4 }  // Expedition
+        } 
     },
     { 
         id: 'musician', 
         name: 'Musician', 
         icon: '🎸', 
-        levels: { min: 5, avg: 15, high: 40, pro: 100 } 
+        // Instruments vs Amps vs Cables
+        levels: { 
+            min: { val: 5, boxRatio: 0.0 },   // 1 Instr (Case - Loose)
+            avg: { val: 15, boxRatio: 0.2 },  // Amps (Loose) + Pedals (Box)
+            high: { val: 40, boxRatio: 0.3 }, // Band Gear
+            pro: { val: 100, boxRatio: 0.4 }  // Studio (Rack gear/Monitors)
+        } 
     },
     { 
         id: 'gaming', 
         name: 'Gaming', 
         icon: '🎮', 
-        levels: { min: 3, avg: 10, high: 25, pro: 60 } 
+        // Mostly boxable until Arcade level
+        levels: { 
+            min: { val: 3, boxRatio: 1.0 },   // Console (Box)
+            avg: { val: 10, boxRatio: 1.0 },  // PC Rig (Box)
+            high: { val: 25, boxRatio: 1.0 }, // Server/VR (Box)
+            pro: { val: 60, boxRatio: 0.5 }   // Arcade Cabinet (Furniture)
+        } 
     },
     { 
         id: 'garden', 
         name: 'Garden', 
         icon: '🌻', 
-        levels: { min: 2, avg: 10, high: 30, pro: 60 } 
+        // Tools vs Machinery
+        levels: { 
+            min: { val: 2, boxRatio: 0.5 },   // Hand tools
+            avg: { val: 10, boxRatio: 0.1 },  // Mower (Furn)
+            high: { val: 30, boxRatio: 0.1 }, // Wheelbarrow (Furn)
+            pro: { val: 60, boxRatio: 0.05 }  // Tractor (Furn)
+        } 
     },
     { 
         id: 'crafter', 
         name: 'Crafts', 
         icon: '🎨', 
-        levels: { min: 5, avg: 15, high: 35, pro: 70 } 
+        // Mostly small items
+        levels: { 
+            min: { val: 5, boxRatio: 1.0 },   // Sewing (Box)
+            avg: { val: 15, boxRatio: 1.0 },  // Paints (Box)
+            high: { val: 35, boxRatio: 0.9 }, // Stash (Box)
+            pro: { val: 70, boxRatio: 0.6 }   // Industrial Table (Furn)
+        } 
     }
 ];
 
@@ -120,7 +174,8 @@ function initCalculator() {
 
 /**
  * Renders the "Active Card" Hobby Matrix
- * Features: Click to activate (defaults to Average), then micro-adjust intensity.
+ * Note: Stores the Level String ('min', 'avg', etc.) instead of raw volume
+ * to allow looking up the boxRatio later.
  */
 function renderHobbies() {
     const container = document.getElementById('hobbyList');
@@ -130,61 +185,50 @@ function renderHobbies() {
             <div class="hobby-icon">${hobby.icon}</div>
             <div class="hobby-name">${hobby.name}</div>
             
-            <input type="hidden" id="val_${hobby.id}" value="0">
+            <input type="hidden" id="level_${hobby.id}" value="">
             
             <div class="intensity-selector" onclick="event.stopPropagation()">
-                <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', ${hobby.levels.min}, this)">Min</button>
-                <button type="button" class="level-btn selected" onclick="setHobbyLevel('${hobby.id}', ${hobby.levels.avg}, this)">Avg</button>
-                <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', ${hobby.levels.high}, this)">High</button>
-                <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', ${hobby.levels.pro}, this)">Pro</button>
+                <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', 'min', this)">Min</button>
+                <button type="button" class="level-btn selected" onclick="setHobbyLevel('${hobby.id}', 'avg', this)">Avg</button>
+                <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', 'high', this)">High</button>
+                <button type="button" class="level-btn" onclick="setHobbyLevel('${hobby.id}', 'pro', this)">Pro</button>
             </div>
         </div>
     `).join('');
 }
 
-/**
- * Toggles a hobby card's active state.
- * If activating: Sets value to 'Average' by default.
- * If deactivating: Sets value to 0.
- */
 window.toggleHobby = function(hobbyId) {
     const card = document.getElementById(`card_${hobbyId}`);
-    const input = document.getElementById(`val_${hobbyId}`);
-    const hobby = HOBBY_DATA.find(h => h.id === hobbyId);
+    const input = document.getElementById(`level_${hobbyId}`);
     
-    // Toggle Active Class
     if (card.classList.contains('active')) {
         // Deactivate
         card.classList.remove('active');
-        input.value = 0;
+        input.value = "";
     } else {
         // Activate (Default to Average)
         card.classList.add('active');
-        input.value = hobby.levels.avg;
+        input.value = "avg";
         
-        // Reset buttons to show Avg as selected
+        // Visuals
         const buttons = card.querySelectorAll('.level-btn');
         buttons.forEach(btn => btn.classList.remove('selected'));
-        buttons[1].classList.add('selected'); // Index 1 is Average
+        buttons[1].classList.add('selected'); // Index 1 is Avg
     }
 };
 
-/**
- * Sets specific intensity level without toggling the card off.
- */
-window.setHobbyLevel = function(hobbyId, volume, btnElement) {
-    const input = document.getElementById(`val_${hobbyId}`);
+window.setHobbyLevel = function(hobbyId, levelKey, btnElement) {
+    const input = document.getElementById(`level_${hobbyId}`);
     const card = document.getElementById(`card_${hobbyId}`);
     
-    // Ensure card is active
     if (!card.classList.contains('active')) {
         card.classList.add('active');
     }
     
-    // Update Value
-    input.value = volume;
+    // Set Level Key
+    input.value = levelKey;
     
-    // Update Visuals
+    // Visuals
     const buttons = card.querySelectorAll('.level-btn');
     buttons.forEach(b => b.classList.remove('selected'));
     btnElement.classList.add('selected');
@@ -221,56 +265,79 @@ function calculateMove() {
     const stuffLevel = document.querySelector('input[name="stuffLevel"]:checked').value;
     
     // 2. Volume Calculations
-    // A. Base Contents
+    
+    // A. Base Contents (100% Boxable)
     const baseVol = BASE_VOLUMES[homeSize];
     const multiplier = STUFF_MULTIPLIERS[stuffLevel];
-    const contentsVol = baseVol * multiplier;
+    const baseContentsVol = baseVol * multiplier;
     
-    // B. Hobby Volume (Sum of hidden inputs)
-    let hobbyVol = 0;
+    // B. Hobby Volume (Split: Boxable vs Furniture)
+    let hobbyBoxVol = 0;
+    let hobbyFurnVol = 0;
+    
     HOBBY_DATA.forEach(hobby => {
-        const val = parseInt(document.getElementById(`val_${hobby.id}`).value) || 0;
-        hobbyVol += val;
+        const levelKey = document.getElementById(`level_${hobby.id}`).value;
+        if (levelKey) {
+            const data = hobby.levels[levelKey];
+            const totalHobbyVol = data.val;
+            const boxVol = totalHobbyVol * data.boxRatio;
+            const furnVol = totalHobbyVol * (1 - data.boxRatio);
+            
+            hobbyBoxVol += boxVol;
+            hobbyFurnVol += furnVol;
+        }
     });
     
     // C. Furniture Volume
-    let furnVol = 0;
-    let furnCount = 0;
+    let houseFurnVol = 0;
+    let houseFurnCount = 0;
     for (const [key, vol] of Object.entries(FURNITURE_VOLS)) {
         const count = parseInt(document.getElementById(`furn_${key}`).value) || 0;
-        furnVol += count * vol;
-        furnCount += count;
+        houseFurnVol += count * vol;
+        houseFurnCount += count;
     }
     
-    // Total Volume
-    const totalVol = contentsVol + hobbyVol + furnVol;
+    // D. Totals
+    // Total Boxable Volume (Base + Hobby Parts)
+    const totalBoxableVol = baseContentsVol + hobbyBoxVol;
+    
+    // Total Furniture Volume (House Furniture + Hobby Furniture)
+    const totalFurnVol = houseFurnVol + hobbyFurnVol;
+    
+    // Total Move Volume
+    const totalMoveVol = totalBoxableVol + totalFurnVol;
     
     // 3. Truck Sizing (Efficiency Adjusted)
-    const reqTruckSpace = totalVol / CONSTANTS.EFFICIENCY_FACTOR;
+    const reqTruckSpace = totalMoveVol / CONSTANTS.EFFICIENCY_FACTOR;
     
     // 4. Box & Item Quantification
-    const boxCount = Math.ceil((contentsVol + hobbyVol) / 3.0); // Avg 3.0 ft3 per box
+    // Only use Boxable Volume for box count
+    const boxCount = Math.ceil(totalBoxableVol / 3.0); 
     const itemCount = boxCount * CONSTANTS.ITEMS_PER_BOX;
     
     // 5. Labor Forecasting
     const packingHours = boxCount / CONSTANTS.PACKING_SPEED;
     
-    // Loading: (Boxes / (10 * Helpers)) + (Furniture * 0.25 / Helpers)
-    // Avoid divide by zero
-    const activeHelpers = Math.max(helpers, 1); 
-    const loadingHours = (boxCount / (10 * activeHelpers)) + ((furnCount * 0.25) / activeHelpers);
+    // Loading: (Boxes / (10 * Helpers)) + (Furniture / Helpers)
+    const activeHelpers = Math.max(helpers, 1);
+    
+    // We treat Hobby Furniture (e.g., Bikes) as "Furniture pieces" for loading time.
+    // Approx: 15 mins (0.25 hrs) per 20 cu ft of furniture? 
+    // Or simplified: Estimate piece count from volume (avg 20cf per piece)
+    const estHobbyPieces = Math.ceil(hobbyFurnVol / 20); 
+    const totalFurnPieces = houseFurnCount + estHobbyPieces;
+    
+    const loadingHours = (boxCount / (10 * activeHelpers)) + ((totalFurnPieces * 0.25) / activeHelpers);
     
     const totalLabor = packingHours + loadingHours;
     const smartStowTime = (itemCount * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
 
     // --- Render Results ---
     
-    // Box Breakdown (Estimate)
     const smallBoxes = Math.round(boxCount * 0.5);
     const medBoxes = Math.round(boxCount * 0.3);
     const lgBoxes = boxCount - smallBoxes - medBoxes;
 
-    // Truck Recommendation
     let truckRec = "";
     let truckWarn = "";
     if (reqTruckSpace < 400) truckRec = "Cargo Van";
@@ -291,7 +358,7 @@ function calculateMove() {
     
     document.getElementById('resTruckSize').textContent = truckRec;
     document.getElementById('resTotalVol').textContent = Math.round(reqTruckSpace).toLocaleString();
-    document.getElementById('resTotalWeight').textContent = Math.round(reqTruckSpace * 7).toLocaleString(); // Rough density est
+    document.getElementById('resTotalWeight').textContent = Math.round(reqTruckSpace * 7).toLocaleString();
     document.getElementById('resTruckWarning').textContent = truckWarn;
     
     document.getElementById('resTotalLabor').textContent = Math.round(totalLabor) + " hrs";
@@ -299,21 +366,17 @@ function calculateMove() {
     document.getElementById('resLoadTime').textContent = loadingHours.toFixed(1) + " hrs";
     document.getElementById('resSmartStowTime').textContent = smartStowTime.toFixed(1);
 
-    // Pivot Message
     const pivotMsg = document.getElementById('pivotMessage');
     const recPlan = document.getElementById('resRecPlan');
     
     if (itemCount > 1000) {
-        pivotMsg.innerHTML = `You have <strong style="color:#f87171">${itemCount.toLocaleString()} items</strong>. That is a £410 mistake waiting to happen if you rely on memory.`;
+        pivotMsg.innerHTML = `You have <strong style="color:#e11d48">${itemCount.toLocaleString()} items</strong>. That is a £410 mistake waiting to happen if you rely on memory.`;
         recPlan.textContent = "Premium or Pro";
     } else {
         pivotMsg.innerHTML = `You have <strong>${itemCount.toLocaleString()} items</strong>. Organization is key to a stress-free move.`;
         recPlan.textContent = "Plus or Premium";
     }
 
-    // Show Results
     document.getElementById('resultsArea').classList.remove('hidden');
-    
-    // Scroll to results
     document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
 }
