@@ -426,6 +426,11 @@ function calculateMove() {
     const smartStowTimeMin = (itemCountMin * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
     const smartStowTimeMax = (itemCountMax * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
 
+    // Calculate manual labeling time (based on SmartStow vs Spreadsheets experiment - ~2x faster)
+    // Manual labeling takes about 2x longer than SmartStow's voice logging
+    const manualTimeMin = smartStowTimeMin * 2;
+    const manualTimeMax = smartStowTimeMax * 2;
+
     // --- Render Results ---
     
     // Box Splits (using Max for supply list safety)
@@ -461,6 +466,9 @@ function calculateMove() {
     
     // SmartStow savings
     document.getElementById('resSmartStowTime').textContent = formatRange(smartStowTimeMin, smartStowTimeMax);
+
+    // Manual labeling time
+    document.getElementById('resManualTime').textContent = formatRange(manualTimeMin, manualTimeMax);
 
     // Dynamic messaging
     const pivotMsg = document.getElementById('pivotMessage');
