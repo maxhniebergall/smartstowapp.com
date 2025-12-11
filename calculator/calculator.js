@@ -426,6 +426,27 @@ function calculateMove() {
     const smartStowTimeMin = (itemCountMin * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
     const smartStowTimeMax = (itemCountMax * CONSTANTS.SMARTSTOW_SEC_PER_ITEM) / 3600;
 
+    // --- START ANALYTICS INSERTION ---
+
+    // GA4: Track Calculator Usage with Parameters
+    if (typeof gtag === 'function') {
+        gtag('event', 'calculate_move', {
+            'home_size': homeSizeKey,       // e.g., '3bed'
+            'occupants': occupants,         // e.g., 2
+            'stuff_level': stuffLevel,      // e.g., 'collector'
+            'recommended_truck': truckRecMax, // e.g., "26' Truck"
+            'estimated_items': itemCountMax,  // e.g., 850
+            'recommended_plan': document.getElementById('resRecPlan').textContent // e.g., "Pro"
+        });
+    }
+
+    // Reddit Pixel: Track as Lead (High Value Action)
+    if (typeof rdt === 'function') {
+        rdt('track', 'Lead');
+    }
+
+    // --- END ANALYTICS INSERTION ---
+
     // Calculate manual labeling time (based on SmartStow vs Spreadsheets experiment - ~2x faster)
     // Manual labeling takes about 2x longer than SmartStow's voice logging
     const manualTimeMin = smartStowTimeMin * 2;
