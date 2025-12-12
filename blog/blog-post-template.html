@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Reddit Pixel -->
-    <script>
+    <!-- CookieConsent CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.css">
+
+    <!-- GA4 (Blocked until Consent) -->
+    <script type="text/plain" data-category="analytics">
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XS68YQNL5N');
+    </script>
+    <script type="text/plain" data-category="analytics" async src="https://www.googletagmanager.com/gtag/js?id=G-XS68YQNL5N"></script>
+
+    <!-- Reddit Pixel (Blocked until Consent) -->
+    <script type="text/plain" data-category="marketing">
     !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','a2_i4828a67cb2z');rdt('track', 'PageVisit');
     </script>
     <!-- DO NOT MODIFY UNLESS TO REPLACE A USER IDENTIFIER -->
     <!-- End Reddit Pixel -->
+
+    <!-- TikTok Pixel (Blocked until Consent) -->
+    <script type="text/plain" data-category="marketing">
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+    var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+    ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)}};
+
+      ttq.load('D4U6LVJC77U1QNJ511U0');
+      ttq.page();
+    }(window, document, 'ttq');
+    </script>
+    <!-- TikTok Pixel Code End -->
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -299,6 +324,68 @@
     </footer>
 
     <script src="../script.js"></script>
+
+    <!-- CookieConsent Library -->
+    <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0/dist/cookieconsent.umd.js"></script>
+
+    <!-- CookieConsent Configuration -->
+    <script>
+    window.addEventListener('load', function(){
+        CookieConsent.run({
+            guiOptions: {
+                consentModal: {
+                    layout: 'box',
+                    position: 'bottom right',
+                    equalWeightButtons: true,
+                    flipButtons: false
+                },
+                preferencesModal: {
+                    layout: 'box',
+                    position: 'right',
+                    equalWeightButtons: true,
+                    flipButtons: false
+                }
+            },
+            categories: {
+                necessary: { readOnly: true },
+                analytics: { enabled: false },
+                marketing: { enabled: false }
+            },
+            language: {
+                default: 'en',
+                translations: {
+                    en: {
+                        consentModal: {
+                            title: 'We use cookies',
+                            description: 'We use cookies to analyze traffic',
+                            acceptAllBtn: 'Accept all',
+                            acceptNecessaryBtn: 'Reject all',
+                            showPreferencesBtn: 'Manage preferences'
+                        },
+                        preferencesModal: {
+                            title: 'Manage cookie preferences',
+                            acceptAllBtn: 'Accept all',
+                            acceptNecessaryBtn: 'Reject all',
+                            savePreferencesBtn: 'Save preferences',
+                            sections: [
+                                {
+                                    title: 'Analytics',
+                                    description: 'Tracks site usage to help us improve your experience.',
+                                    linkedCategory: 'analytics'
+                                },
+                                {
+                                    title: 'Marketing',
+                                    description: 'Used for advertising and retargeting.',
+                                    linkedCategory: 'marketing'
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        });
+    });
+    </script>
 
     <!-- Optional: Add analytics tracking for CTA clicks -->
     <script>
