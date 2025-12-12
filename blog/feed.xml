@@ -6,11 +6,20 @@
     <link>https://smartstowapp.com/blog/</link>
     <atom:link href="https://smartstowapp.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <language>en-us</language>
-    <lastBuildDate>Thu, 11 Dec 2025 08:00:00 GMT</lastBuildDate>
- 
-      <!-- Blog Posts (newest first) -->
-      <item>
-         <title>The Efficiency Guide: Why SmartStow is Superior to Your Notes App for Gift Shopping</title>
+    <lastBuildDate>Fri, 12 Dec 2025 08:00:00 GMT</lastBuildDate>
+
+    <!-- Blog Posts (newest first) -->
+    <item>
+       <title>The Science of Moving: How Our New Calculator Predicts Your Chaos</title>
+       <description>Stop guessing how many boxes you need. We built a moving calculator that uses volumetric data and hobby profiles to predict your exact truck size and packing time.</description>
+       <link>https://smartstowapp.com/blog/science-of-moving-calculator/</link>
+       <guid>https://smartstowapp.com/blog/science-of-moving-calculator/</guid>
+       <pubDate>Fri, 12 Dec 2025 08:00:00 GMT</pubDate>
+       <category>Moving Tools</category>
+    </item>
+
+    <item>
+       <title>The Efficiency Guide: Why SmartStow is Superior to Your Notes App for Gift Shopping</title>
          <description>Why standard notes apps fail for gift logistics and how SmartStow's integrated inventory ensures you never lose a purchased gift.</description>
          <link>https://smartstowapp.com/blog/efficiency-guide-smartstow-vs-notes-app/</link>
          <guid>https://smartstowapp.com/blog/efficiency-guide-smartstow-vs-notes-app/</guid>
