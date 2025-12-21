@@ -1,0 +1,21 @@
+{
+    "name": "SmartStow - Say it. Stow it. Find it.",
+    "short_name": "SmartStow",
+    "description": "Organize your belongings with voice recording and never lose track of what you've stored.",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#000000",
+    "background_color": "#000000",
+    "display": "standalone",
+    "start_url": "/"
+}
