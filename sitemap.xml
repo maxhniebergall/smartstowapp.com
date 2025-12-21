@@ -33,6 +33,22 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- FAQ Section -->
+  <url>
+    <loc>https://smartstowapp.com/faq/</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- How-To Section -->
+  <url>
+    <loc>https://smartstowapp.com/howto/</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Blog Posts -->
   <url>
     <loc>https://smartstowapp.com/blog/efficiency-guide-smartstow-vs-notes-app/</loc>
@@ -64,6 +80,36 @@
   <url>
     <loc>https://smartstowapp.com/blog/smartstow-vs-spreadsheets/</loc>
     <lastmod>2025-12-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- FAQ Posts -->
+  <url>
+    <loc>https://smartstowapp.com/faq/how-to-inventory-a-house-for-long-distance-moving/</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://smartstowapp.com/faq/how-to-inventory-a-cold-garage-without-freezing-your-hands/</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- How-To Posts -->
+  <url>
+    <loc>https://smartstowapp.com/howto/how-to-inventory-winter-tires-with-smartstow/</loc>
+    <lastmod>2025-12-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://smartstowapp.com/howto/how-to-inventory-winter-tires-with-voice-commands/</loc>
+    <lastmod>2025-12-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
