@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://smartstowapp.com/</loc>
@@ -25,7 +25,7 @@
     <priority>0.2</priority>
   </url>
 
-  <!-- Blog Section -->
+  
   <url>
     <loc>https://smartstowapp.com/blog/</loc>
     <lastmod>2025-12-11</lastmod>
@@ -33,7 +33,7 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- FAQ Section -->
+  
   <url>
     <loc>https://smartstowapp.com/faq/</loc>
     <lastmod>2025-12-21</lastmod>
@@ -41,16 +41,16 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- How-To Section -->
+  
   <url>
     <loc>https://smartstowapp.com/howto/</loc>
-    <lastmod>2025-12-21</lastmod>
+    <lastmod>2026-01-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Blog Posts -->
-  <url>
+  
+  <url><loc>https://smartstowapp.com/howto/how-to-inventory-winter-tires-with-voice-commands/</loc><lastmod>2026-01-04</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url><url>
     <loc>https://smartstowapp.com/blog/efficiency-guide-smartstow-vs-notes-app/</loc>
     <lastmod>2025-12-11</lastmod>
     <changefreq>monthly</changefreq>
@@ -84,7 +84,7 @@
     <priority>0.7</priority>
   </url>
 
-  <!-- FAQ Posts -->
+  
   <url>
     <loc>https://smartstowapp.com/faq/how-to-inventory-a-house-for-long-distance-moving/</loc>
     <lastmod>2025-12-21</lastmod>
@@ -92,7 +92,7 @@
     <priority>0.7</priority>
   </url>
 
-  <!-- How-To Posts -->
+  
   <url>
     <loc>https://smartstowapp.com/howto/how-to-inventory-winter-tires-with-voice-commands/</loc>
     <lastmod>2025-12-21</lastmod>
@@ -100,27 +100,6 @@
     <priority>0.7</priority>
   </url>
 
-  <!--
-  BLOG POST TEMPLATE - Copy this for each new blog post:
-
-  <url>
-    <loc>https://smartstowapp.com/blog/your-post-slug/</loc>
-    <lastmod>2025-11-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  Priority Guidelines:
-  - Homepage: 1.0
-  - Blog index: 0.8
-  - Comparison posts (money pages): 0.9
-  - Regular blog posts: 0.7
-  - Utility pages: 0.2-0.3
-
-  After adding a post:
-  1. Update lastmod to publication date
-  2. Commit and push changes
-  3. Submit to Google Search Console
-  -->
+  
 
 </urlset>
