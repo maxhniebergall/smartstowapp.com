@@ -54,12 +54,12 @@
 
   <url>
     <loc>https://smartstowapp.com/howto/</loc>
-    <lastmod>2026-01-13</lastmod>
+    <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <url>
+  <url><loc>https://smartstowapp.com/howto/how-to-inventory-ski-boots-with-voice-commands/</loc><lastmod>2026-01-16</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url><url>
     <loc>https://smartstowapp.com/howto/how-to-organize-christmas-lights-with-voice-commands/</loc>
     <lastmod>2026-01-13</lastmod>
     <changefreq>monthly</changefreq>
